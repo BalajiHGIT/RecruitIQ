@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placements | Placement Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+    <aside class="sidebar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span><b>Placement</b><small>MANAGEMENT</small></span>
+        </a>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="companies.html">Companies</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="applications.html">Applications</a>
+            <a href="interviews.html">Interviews</a>
+            <a href="placements.html" class="active">Placements</a>
+            <a href="placement-process.html">Placement Process</a>
+            <a href="reports.html">Reports</a>
+        </nav>
+
+        <a class="logout" href="/logout">Logout</a>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+                <h1>Placements</h1>
+                <p>Manage final candidate placement records.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span><b>Admin User</b><small>Placement Officer</small></span>
+            </div>
+        </header>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Placement Records</h2>
+                    <p>Final selected and placed candidates.</p>
+                </div>
+                <button class="btn btn-primary" onclick="loadPlacements()">
+                    Refresh
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <p>Total Placements</p>
+                    <h2 id="totalCount">0</h2>
+                </div>
+                <div class="stat-card">
+                    <p>Joined</p>
+                    <h2 id="joinedCount">0</h2>
+                </div>
+                <div class="stat-card">
+                    <p>Confirmed</p>
+                    <h2 id="confirmedCount">0</h2>
+                </div>
+            </div>
+
+            <p id="message"></p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Candidate ID</th>
+                            <th>Company ID</th>
+                            <th>Job ID</th>
+                            <th>Joining Date</th>
+                            <th>Package</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="placementTable">
+                        <tr>
+                            <td colspan="7">Loading placements...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="footer">
+            Recruitment & Placement Management System
+        </footer>
+
+    </main>
+</div>
+
+<script>
+async function loadPlacements() {
+    const table = document.getElementById("placementTable");
+    const message = document.getElementById("message");
+
+    table.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
+
+    try {
+        const response = await fetch("/api/placements");
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to load placements");
+        }
+
+        const placements = result.placements || [];
+
+        document.getElementById("totalCount").textContent = placements.length;
+        document.getElementById("joinedCount").textContent =
+            placements.filter(p => p.placement_status === "Joined").length;
+        document.getElementById("confirmedCount").textContent =
+            placements.filter(p => p.placement_status === "Confirmed").length;
+
+        if (placements.length === 0) {
+            table.innerHTML =
+                "<tr><td colspan='7'>No placement records found.</td></tr>";
+            message.textContent = "No placement records available yet.";
+            return;
+        }
+
+        message.textContent = "";
+
+        table.innerHTML = placements.map(p => `
+            <tr>
+                <td>${p.placement_id ?? p.id ?? "-"}</td>
+                <td>${p.candidate_id ?? "-"}</td>
+                <td>${p.company_id ?? "-"}</td>
+                <td>${p.job_id ?? "-"}</td>
+                <td>${p.joining_date ?? "-"}</td>
+                <td>${p.package ?? "-"}</td>
+                <td>${p.placement_status ?? "-"}</td>
+            </tr>
+        `).join("");
+
+    } catch (error) {
+        table.innerHTML =
+            "<tr><td colspan='7'>Unable to load placement records.</td></tr>";
+        message.textContent = error.message;
+    }
+}
+
+loadPlacements();
+</script>
+
+</body>
+</html>

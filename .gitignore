@@ -1,0 +1,29 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+build/
+dist/
+*.spec
+recruitiq_debug.log
+*.db
+
+# Backup files
+app_before_password_change.py
+app_cli_backup.py
+
+# Logs
+*.log
+
+# Uploaded resumes and files
+uploads/
+
+app_before_github_security.py
+
+# Frontend backup files
+frontend/branding_backup/
+frontend/*_backup.html
+frontend/*_before_fix.html

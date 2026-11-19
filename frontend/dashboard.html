@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>
+                <b>RecruitIQ</b>
+                <small>PLACEMENT SYSTEM</small>
+            </span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+       <nav>
+    <a href="dashboard.html" class="active">
+        <span class="nav-icon">▦</span> Dashboard
+    </a>
+
+    <a href="candidates.html">
+        <span class="nav-icon">♟</span> Candidates
+    </a>
+
+    <a href="companies.html">
+        <span class="nav-icon">▣</span> Companies
+    </a>
+
+    <a href="jobs.html">
+        <span class="nav-icon">▤</span> Jobs
+    </a>
+
+    <a href="applications.html">
+        <span class="nav-icon">▧</span> Applications
+    </a>
+
+    <a href="interviews.html">
+        <span class="nav-icon">◷</span> Interviews
+    </a>
+
+    <a href="offers.html">
+        <span class="nav-icon">📄</span> Offers
+    </a>
+
+    <a href="placements.html">
+        <span class="nav-icon">🎓</span> Placements
+    </a>
+
+    <a href="placement-process.html">
+        <span class="nav-icon">◎</span> Placement Process
+    </a>
+
+    <a href="resume-screening.html">
+        <span class="nav-icon">🤖</span> AI Resume Screening
+    </a>
+</nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-help">
+                <div class="help-icon">✦</div>
+                <b>Placement Support</b>
+                <p>Manage your recruitment activities efficiently.</p>
+            </div>
+
+            <a class="logout" href="/logout">
+                <span class="nav-icon">↪</span> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOP HEADER -->
+        <header class="dashboard-topbar">
+            <div>
+                <p class="eyebrow">OVERVIEW / DASHBOARD</p>
+                <h1>Dashboard</h1>
+                <p class="header-subtitle">
+                    Welcome back, Admin! Here's your placement overview.
+                </p>
+            </div>
+
+            <div class="header-actions">
+                <a href="reports.html" class="dashboard-report-btn">
+                    <span>↗</span> View Reports
+                </a>
+
+                <div class="dashboard-profile">
+                    <div class="profile-avatar">A</div>
+                    <div>
+                        <b>Admin User</b>
+                        <small>Placement Officer</small>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- WELCOME BANNER -->
+        <section class="welcome-banner">
+            <div>
+                <span class="welcome-tag">RECRUITMENT OVERVIEW</span>
+                <h2>Build careers. Create opportunities.</h2>
+                <p>
+                    Track candidates, manage hiring activities and monitor
+                    placement performance from one place.
+                </p>
+                <a href="candidates.html" class="welcome-button">
+                    Explore Candidates <span>→</span>
+                </a>
+            </div>
+
+            <div class="welcome-graphic" aria-hidden="true">
+                <div class="graphic-circle circle-one"></div>
+                <div class="graphic-circle circle-two"></div>
+                <div class="graphic-card">
+                    <span>PLACEMENT RATE</span>
+                    <strong id="dashboard-placement-rate">0%</strong>
+                    <small>Live database data</small>
+                </div>
+                <div class="graphic-star">✦</div>
+            </div>
+        </section>
+
+        <!-- STATISTICS -->
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Key Statistics</h2>
+                    <p>Summary of recruitment activities</p>
+                </div>
+                <span class="section-period">Overall Overview</span>
+            </div>
+
+            <div class="dashboard-stats">
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-icon stat-blue">♙</span>
+                        <span class="stat-label">Candidates</span>
+                    </div>
+                    <strong id="dashboard-candidates">0</strong>
+                    <div class="stat-bottom">
+    <span>Registered candidates</span>
+</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-icon stat-purple">▣</span>
+                        <span class="stat-label">Companies</span>
+                    </div>
+                   <strong id="dashboard-companies">0</strong>
+                    <div class="stat-bottom">
+    <span>Registered companies</span>
+</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-icon stat-orange">▤</span>
+                        <span class="stat-label">Open Jobs</span>
+                    </div>
+                   <strong id="dashboard-jobs">0</strong>
+                    <div class="stat-bottom">
+    <span>Available positions</span>
+</div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-icon stat-green">✓</span>
+                        <span class="stat-label">Placements</span>
+                    </div>
+                    <strong id="dashboard-placements">0</strong>
+                   <div class="stat-bottom">
+    <span>Successfully placed</span>
+</div>
+                </article>
+
+            </div>
+        </section>
+
+<!-- ANALYTICS -->
+<section class="analytics-grid">
+
+    <!-- PLACEMENT ANALYTICS -->
+    <article class="dashboard-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h2>Placement Analytics</h2>
+                <p>Actual placement statistics from database</p>
+            </div>
+            <span class="chart-indicator">● Actual Placements</span>
+        </div>
+
+        <div class="bar-chart">
+            <div class="chart-y-labels">
+                <span>40</span>
+                <span>30</span>
+                <span>20</span>
+                <span>10</span>
+                <span>0</span>
+            </div>
+
+            <div class="chart-content">
+                <div class="chart-grid-lines">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="bar-groups">
+                    <div class="bar-item">
+                        <div
+                            class="bar"
+                            id="placement-bar"
+                            style="height: 0%; display: none;">
+                        </div>
+                        <span>Actual Placements</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </article>
+
+    <!-- HIRING PIPELINE -->
+    <article class="dashboard-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h2>Hiring Pipeline</h2>
+                <p>Application stage overview</p>
+            </div>
+        </div>
+
+        <div class="pipeline-list">
+
+            <div class="pipeline-item">
+                <div class="pipeline-info">
+                    <span>Applied</span>
+                    <b id="pipeline-applied">0</b>
+                </div>
+                <div class="pipeline-track">
+                    <span id="bar-applied"
+                          class="pipeline-fill fill-blue"
+                          style="width:0%">
+                    </span>
+                </div>
+            </div>
+
+            <div class="pipeline-item">
+                <div class="pipeline-info">
+                    <span>Shortlisted</span>
+                    <b id="pipeline-shortlisted">0</b>
+                </div>
+                <div class="pipeline-track">
+                    <span id="bar-shortlisted"
+                          class="pipeline-fill fill-purple"
+                          style="width:0%">
+                    </span>
+                </div>
+            </div>
+
+            <div class="pipeline-item">
+                <div class="pipeline-info">
+                    <span>Interviewed</span>
+                    <b id="pipeline-interviewed">0</b>
+                </div>
+                <div class="pipeline-track">
+                    <span id="bar-interviewed"
+                          class="pipeline-fill fill-orange"
+                          style="width:0%">
+                    </span>
+                </div>
+            </div>
+
+            <div class="pipeline-item">
+                <div class="pipeline-info">
+                    <span>Selected</span>
+                    <b id="pipeline-selected">0</b>
+                </div>
+                <div class="pipeline-track">
+                    <span id="bar-selected"
+                          class="pipeline-fill fill-green"
+                          style="width:0%">
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <a class="panel-link" href="applications.html">
+            View Applications →
+        </a>
+
+    </article>
+
+</section>
+
+<!-- BOTTOM CONTENT -->
+<section class="bottom-grid">
+
+    <!-- RECENT CANDIDATES -->
+    <article class="dashboard-panel activity-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h2>Recent Candidates</h2>
+                <p>Latest candidate registration records</p>
+            </div>
+
+            <a href="candidates.html" class="panel-link">
+                View all →
+            </a>
+        </div>
+
+        <div class="table-wrap dashboard-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Qualification</th>
+                        <th>Technology</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+               <tbody id="recent-candidates-body">
+    <tr>
+        <td colspan="4">Loading candidates...</td>
+    </tr>
+</tbody>
+            </table>
+        </div>
+
+    </article>
+
+    <!-- UPCOMING INTERVIEWS -->
+    <article class="dashboard-panel interview-panel">
+
+        <div class="panel-heading">
+            <div>
+                <h2>Upcoming Interviews</h2>
+                <p>Interview schedule</p>
+            </div>
+
+            <a href="interviews.html" class="panel-link">
+                View all →
+            </a>
+        </div>
+
+        <div class="interview-list" id="upcoming-interviews-list">
+    <p>Loading interviews...</p>
+</div>
+    </article>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="dashboard-footer">
+    <span>
+        © 2026 RecruitIQ · Recruitment & Placement Management System
+    </span>
+    <span>
+        Smart Recruitment Dashboard
+    </span>
+</footer>
+
+    </main>
+</div>
+
+<script>
+async function loadDashboardStats() {
+    try {
+        const response = await fetch("/api/reports");
+        const data = await response.json();
+
+        if (!response.ok || !data.success || !data.report) {
+            console.error("Dashboard data loading failed:", data.message);
+            return;
+        }
+
+        const report = data.report;
+
+        // Hiring Pipeline
+        const totalApplications = report.total_applications ?? 0;
+
+        const pipelineStages = [
+            {
+                name: "applied",
+                count: report.applied ?? 0
+            },
+            {
+                name: "shortlisted",
+                count: report.shortlisted ?? 0
+            },
+            {
+                name: "interviewed",
+                count: report.interviewed ?? 0
+            },
+            {
+                name: "selected",
+                count: report.selected ?? 0
+            }
+        ];
+
+        pipelineStages.forEach(stage => {
+            const countElement = document.getElementById(
+                `pipeline-${stage.name}`
+            );
+
+            const barElement = document.getElementById(
+                `bar-${stage.name}`
+            );
+
+            if (countElement && barElement) {
+                countElement.textContent = stage.count;
+
+                const percentage = totalApplications > 0
+                    ? (stage.count / totalApplications) * 100
+                    : 0;
+
+                barElement.style.width =
+                    `${Math.min(percentage, 100)}%`;
+            }
+        });
+
+        // Dashboard Statistics
+        document.getElementById("dashboard-candidates").textContent =
+            report.total_candidates ?? 0;
+
+        document.getElementById("dashboard-companies").textContent =
+            report.total_companies ?? 0;
+
+        document.getElementById("dashboard-jobs").textContent =
+            report.open_jobs ?? 0;
+
+        document.getElementById("dashboard-placements").textContent =
+            report.total_placements ?? 0;
+
+        document.getElementById("dashboard-placement-rate").textContent =
+            (report.placement_rate ?? 0) + "%";
+
+        // Placement Analytics
+        const placementCount = report.total_placements ?? 0;
+        const placementBar = document.getElementById("placement-bar");
+
+        if (placementBar) {
+            placementBar.style.display =
+                placementCount > 0 ? "" : "none";
+
+            placementBar.style.height =
+                `${Math.min((placementCount / 40) * 100, 100)}%`;
+
+            placementBar.title =
+                `${placementCount} Placements`;
+        }
+
+    } catch (error) {
+        console.error("Dashboard API Error:", error);
+    }
+}
+
+
+
+
+// Load Dashboard Statistics
+async function loadDashboardStats() {
+    try {
+        const response = await fetch("/api/reports");
+        const data = await response.json();
+
+        if (!response.ok || !data.success || !data.report) {
+            console.error("Dashboard data loading failed");
+            return;
+        }
+
+        const report = data.report;
+
+        // Hiring Pipeline
+        const totalApplications = report.total_applications ?? 0;
+
+        const pipelineStages = [
+            { name: "applied", count: report.applied ?? 0 },
+            { name: "shortlisted", count: report.shortlisted ?? 0 },
+            { name: "interviewed", count: report.interviewed ?? 0 },
+            { name: "selected", count: report.selected ?? 0 }
+        ];
+
+        pipelineStages.forEach(stage => {
+            const countElement = document.getElementById(
+                `pipeline-${stage.name}`
+            );
+
+            const barElement = document.getElementById(
+                `bar-${stage.name}`
+            );
+
+            if (countElement && barElement) {
+                countElement.textContent = stage.count;
+
+                const percentage = totalApplications > 0
+                    ? (stage.count / totalApplications) * 100
+                    : 0;
+
+                barElement.style.width =
+                    `${Math.min(percentage, 100)}%`;
+            }
+        });
+
+        // Dashboard Statistics
+        document.getElementById("dashboard-candidates").textContent =
+            report.total_candidates ?? 0;
+
+        document.getElementById("dashboard-companies").textContent =
+            report.total_companies ?? 0;
+
+        document.getElementById("dashboard-jobs").textContent =
+            report.open_jobs ?? 0;
+
+        document.getElementById("dashboard-placements").textContent =
+            report.total_placements ?? 0;
+
+        document.getElementById("dashboard-placement-rate").textContent =
+            (report.placement_rate ?? 0) + "%";
+
+        // Placement Analytics
+        const placementCount = report.total_placements ?? 0;
+        const placementBar = document.getElementById("placement-bar");
+
+        if (placementBar) {
+            placementBar.style.display =
+                placementCount > 0 ? "" : "none";
+
+            placementBar.style.height =
+                `${Math.min((placementCount / 40) * 100, 100)}%`;
+
+            placementBar.title =
+                `${placementCount} Placements`;
+        }
+
+    } catch (error) {
+        console.error("Dashboard API Error:", error);
+    }
+}
+
+
+// Load Recent Candidates from Database
+async function loadRecentCandidates() {
+    const tbody = document.getElementById("recent-candidates-body");
+
+    if (!tbody) return;
+
+    try {
+        const response = await fetch("/api/candidates");
+        const data = await response.json();
+
+        if (!response.ok || !data.success ||
+            !Array.isArray(data.candidates)) {
+            throw new Error("Unable to load candidates");
+        }
+
+        tbody.innerHTML = "";
+
+        const candidates = data.candidates
+            .slice()
+            .sort((a, b) =>
+                new Date(b.created_at) - new Date(a.created_at)
+            )
+            .slice(0, 5);
+
+        if (candidates.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4">No candidates found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        candidates.forEach(candidate => {
+            const row = document.createElement("tr");
+
+            [
+                candidate.full_name || "-",
+                candidate.qualification || "-",
+                candidate.technology || "-",
+                candidate.candidate_status || "-"
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Recent Candidates Error:", error);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4">Unable to load candidates.</td>
+            </tr>
+        `;
+    }
+}
+// Load Upcoming Interviews from Database
+async function loadUpcomingInterviews() {
+    const container = document.getElementById(
+        "upcoming-interviews-list"
+    );
+
+    if (!container) return;
+
+    try {
+        const response = await fetch("/api/interviews");
+        const data = await response.json();
+
+        if (!response.ok || !data.success ||
+            !Array.isArray(data.interviews)) {
+            throw new Error("Unable to load interviews");
+        }
+
+        container.innerHTML = "";
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const interviews = data.interviews
+            .filter(interview => {
+                const interviewDate = new Date(interview.interview_date);
+                return !isNaN(interviewDate.getTime()) &&
+                    interviewDate >= today;
+            })
+            .sort((a, b) =>
+                new Date(a.interview_date) -
+                new Date(b.interview_date)
+            )
+            .slice(0, 5);
+
+        if (interviews.length === 0) {
+            container.innerHTML =
+                "<p>No upcoming interviews found.</p>";
+            return;
+        }
+
+        interviews.forEach(interview => {
+            const item = document.createElement("div");
+            item.className = "interview-item";
+
+            const date = new Date(interview.interview_date);
+
+            const dateText = date.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            });
+
+            const timeText = date.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+            const details = [
+                {
+                    tag: "h3",
+                    text: interview.full_name || "Unknown Candidate"
+                },
+                {
+                    tag: "p",
+                    text: interview.job_title || "Unknown Job"
+                },
+                {
+                    tag: "p",
+                    text: `${interview.round_name || "-"} | ${dateText} | ${timeText}`
+                },
+                {
+                    tag: "p",
+                    text: `Interviewer: ${interview.interviewer || "-"} | Result: ${interview.result || "-"}`
+                }
+            ];
+
+            details.forEach(detail => {
+                const element = document.createElement(detail.tag);
+                element.textContent = detail.text;
+                item.appendChild(element);
+            });
+
+            container.appendChild(item);
+        });
+
+    } catch (error) {
+        console.error("Upcoming Interviews Error:", error);
+        container.innerHTML =
+            "<p>Unable to load upcoming interviews.</p>";
+    }
+}
+
+
+// Execute Dashboard Functions
+loadDashboardStats();
+loadRecentCandidates();
+loadUpcomingInterviews();
+
+</script>
+
+</body>
+</html>

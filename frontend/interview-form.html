@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule Interview | Placement Manager</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.form-card{max-width:700px;background:white;padding:28px;border-radius:14px;margin-top:25px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;margin-bottom:8px;font-weight:600}
+.form-group input,.form-group select,.form-group textarea{
+width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box
+}
+.form-group textarea{min-height:90px;resize:vertical}
+.submit-btn{padding:12px 24px;border:0;border-radius:8px;background:#3157d5;color:white;cursor:pointer}
+#message{margin-top:16px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+<a class="brand" href="dashboard.html">
+<span class="brand-mark">RI</span>
+<span><b>Placement</b><small>MANAGEMENT</small></span>
+</a>
+<nav>
+<a href="dashboard.html">Dashboard</a>
+<a href="candidates.html">Candidates</a>
+<a href="companies.html">Companies</a>
+<a href="jobs.html">Jobs</a>
+<a href="applications.html">Applications</a>
+<a href="interviews.html" class="active">Interviews</a>
+<a href="placement-process.html">Placement Process</a>
+<a href="reports.html">Reports</a>
+</nav>
+<a class="logout" href="/logout">Logout</a>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+<h1>Schedule Interview</h1>
+<p>Schedule an interview for a candidate.</p>
+</div>
+<div class="user-chip">
+<span class="avatar">A</span>
+<span><b>Admin User</b><small>Placement Officer</small></span>
+</div>
+</header>
+
+<div class="form-card">
+<h2>New Interview</h2>
+
+<form id="interviewForm">
+<div class="form-group">
+<label for="application_id">Select Application</label>
+<select id="application_id" required>
+<option value="">Loading applications...</option>
+</select>
+</div>
+
+<div class="form-group">
+<label for="round_name">Interview Round</label>
+<select id="round_name" required>
+<option value="">Choose Round</option>
+<option value="Technical Round">Technical Round</option>
+<option value="HR Round">HR Round</option>
+<option value="Aptitude Round">Aptitude Round</option>
+<option value="Final Round">Final Round</option>
+</select>
+</div>
+
+<div class="form-group">
+<label for="interview_date">Interview Date & Time</label>
+<input type="datetime-local" id="interview_date" required>
+</div>
+
+<div class="form-group">
+<label for="interviewer">Interviewer Name</label>
+<input type="text" id="interviewer" placeholder="Enter interviewer name">
+</div>
+
+<div class="form-group">
+<label for="feedback">Feedback</label>
+<textarea id="feedback" placeholder="Enter interview feedback"></textarea>
+</div>
+
+<div class="form-group">
+<label for="result">Interview Result</label>
+<select id="result" required>
+<option value="Pending">Pending</option>
+<option value="Selected">Selected</option>
+<option value="Rejected">Rejected</option>
+<option value="Next Round">Next Round</option>
+</select>
+</div>
+
+<button type="submit" class="submit-btn">Schedule Interview</button>
+</form>
+
+<p id="message"></p>
+</div>
+</main>
+</div>
+
+<script>
+async function loadApplications() {
+    const select = document.getElementById("application_id");
+
+    try {
+        const response = await fetch("/api/applications");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to load applications.");
+        }
+
+        select.innerHTML = '<option value="">Choose Application</option>';
+
+        (data.applications || []).forEach(app => {
+            select.innerHTML += `
+                <option value="${app.application_id}">
+                    Application #${app.application_id} - ${escapeHTML(app.full_name)} - ${escapeHTML(app.job_title)}
+                </option>`;
+        });
+
+        if (!data.applications || data.applications.length === 0) {
+            select.innerHTML = '<option value="">No applications available</option>';
+        }
+
+    } catch (error) {
+        select.innerHTML = '<option value="">Could not load applications</option>';
+        document.getElementById("message").textContent = error.message;
+    }
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+document.getElementById("interviewForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const message = document.getElementById("message");
+    const dateValue = document.getElementById("interview_date").value;
+
+    if (!dateValue) {
+        message.textContent = "Please select interview date and time.";
+        message.style.color = "red";
+        return;
+    }
+
+    const payload = {
+        application_id: Number(document.getElementById("application_id").value),
+        round_name: document.getElementById("round_name").value,
+        interview_date: dateValue.replace("T", " ") + ":00",
+        interviewer: document.getElementById("interviewer").value.trim(),
+        feedback: document.getElementById("feedback").value.trim(),
+        result: document.getElementById("result").value
+    };
+
+    message.textContent = "Scheduling interview...";
+
+    try {
+        const response = await fetch("/api/interviews", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Interview scheduling failed.");
+        }
+
+        message.textContent = "Interview scheduled successfully! Interview ID: " + data.interview_id;
+        message.style.color = "green";
+        this.reset();
+
+    } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "red";
+    }
+});
+
+loadApplications();
+</script>
+</body>
+</html>

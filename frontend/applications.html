@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applications | Placement Manager</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.page-actions{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}
+.page-actions input,.page-actions select{padding:12px;border:1px solid #ddd;border-radius:8px;min-width:190px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:14px;text-align:left;border-bottom:1px solid #eee;white-space:nowrap}
+.action-btn{padding:7px 10px;border:0;border-radius:6px;cursor:pointer;margin:2px}
+.edit-btn{background:#e8f0ff;color:#2455a4}
+.delete-btn{background:#ffe8e8;color:#b42318}
+#message{margin:12px 0;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+<a class="brand" href="dashboard.html">
+<span class="brand-mark">RI</span>
+<span><b>Placement</b><small>MANAGEMENT</small></span>
+</a>
+<nav>
+<a href="dashboard.html">Dashboard</a>
+<a href="candidates.html">Candidates</a>
+<a href="companies.html">Companies</a>
+<a href="jobs.html">Jobs</a>
+<a href="applications.html" class="active">Applications</a>
+<a href="interviews.html">Interviews</a>
+<a href="placement-process.html">Placement Process</a>
+<a href="reports.html">Reports</a>
+</nav>
+<a class="logout" href="/logout">Logout</a>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+<h1>Applications</h1>
+<p>Manage candidate job applications.</p>
+</div>
+<div class="user-chip">
+<span class="avatar">A</span>
+<span><b>Admin User</b><small>Placement Officer</small></span>
+</div>
+</header>
+
+<div class="page-actions">
+<input type="text" id="searchInput" placeholder="Search candidate or job..." oninput="filterApplications()">
+<select id="statusFilter" onchange="filterApplications()">
+<option value="">All Statuses</option>
+<option>Applied</option>
+<option>Shortlisted</option>
+<option>Rejected</option>
+<option>Selected</option>
+<option>Withdrawn</option>
+</select>
+<button class="action-btn edit-btn" onclick="loadApplications()">Refresh</button>
+</div>
+
+<p id="message"></p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Candidate</th>
+<th>Job</th>
+<th>Company</th>
+<th>Applied On</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="applicationTable">
+<tr><td colspan="7">Loading applications...</td></tr>
+</tbody>
+</table>
+</div>
+<footer class="footer">Recruitment & Placement Management System</footer>
+</main>
+</div>
+
+<script>
+let allApplications = [];
+
+async function loadApplications() {
+    const table = document.getElementById("applicationTable");
+    const message = document.getElementById("message");
+
+    table.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+
+    try {
+        const response = await fetch("/api/applications");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to load applications.");
+        }
+
+        allApplications = data.applications || [];
+        filterApplications();
+        message.textContent = "Total Applications: " + allApplications.length;
+    } catch (error) {
+        table.innerHTML = '<tr><td colspan="7">Unable to load applications.</td></tr>';
+        message.textContent = error.message;
+    }
+}
+
+function filterApplications() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const status = document.getElementById("statusFilter").value;
+
+    const filtered = allApplications.filter(app => {
+        const text = (
+            (app.full_name || "") + " " +
+            (app.job_title || "") + " " +
+            (app.company_name || "")
+        ).toLowerCase();
+
+        return text.includes(search) &&
+            (!status || app.application_status === status);
+    });
+
+    displayApplications(filtered);
+}
+
+function displayApplications(applications) {
+    const table = document.getElementById("applicationTable");
+
+    if (!applications.length) {
+        table.innerHTML = '<tr><td colspan="7">No applications found.</td></tr>';
+        return;
+    }
+
+    table.innerHTML = applications.map(app => `
+        <tr>
+            <td>${app.application_id}</td>
+            <td>${escapeHTML(app.full_name)}</td>
+            <td>${escapeHTML(app.job_title)}</td>
+            <td>${escapeHTML(app.company_name)}</td>
+            <td>${escapeHTML(app.application_date)}</td>
+            <td>${escapeHTML(app.application_status)}</td>
+            <td>
+                <button class="action-btn edit-btn"
+                    onclick="updateStatus(${app.application_id}, '${app.application_status}')">
+                    Update
+                </button>
+                <button class="action-btn delete-btn"
+                    onclick="deleteApplication(${app.application_id})">
+                    Delete
+                </button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+async function updateStatus(id, currentStatus) {
+    const allowed = ["Applied", "Shortlisted", "Rejected", "Selected", "Withdrawn"];
+    const newStatus = prompt(
+        "Enter new status:\nApplied, Shortlisted, Rejected, Selected, Withdrawn",
+        currentStatus
+    );
+
+    if (newStatus === null) return;
+
+    if (!allowed.includes(newStatus.trim())) {
+        alert("Please enter a valid status.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/applications/${id}`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({application_status: newStatus.trim()})
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Status update failed.");
+        }
+
+        alert("Application status updated successfully.");
+        loadApplications();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function deleteApplication(id) {
+    if (!confirm("Are you sure you want to delete this application?")) return;
+
+    try {
+        const response = await fetch(`/api/applications/${id}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Delete failed.");
+        }
+
+        alert("Application deleted successfully.");
+        loadApplications();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+loadApplications();
+</script>
+</body>
+</html>

@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Companies | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .company-stats {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:15px;
+            margin-bottom:22px;
+        }
+        .company-stat {
+            background:white;
+            padding:19px;
+            border:1px solid #e4eaf2;
+            border-radius:13px;
+        }
+        .company-stat small,.company-stat span {
+            display:block;
+            color:#8490a3;
+            font-size:11px;
+            margin-bottom:9px;
+        }
+        .company-stat strong {
+            color:#1c2943;
+            font-size:27px;
+        }
+        .company-toolbar {
+            display:flex;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:17px;
+        }
+        .company-toolbar input {
+            width:65%;
+            max-width:600px;
+        }
+        .company-panel {
+            background:white;
+            border:1px solid #e4eaf2;
+            border-radius:14px;
+            padding:20px;
+        }
+        .company-heading {
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:17px;
+        }
+        .company-heading h2 {
+            margin:0;
+            font-size:16px;
+        }
+        .company-heading p {
+            color:#8993a5;
+            font-size:11px;
+        }
+        .company-table {
+            width:100%;
+            min-width:850px;
+            border-collapse:collapse;
+        }
+        .company-table th {
+            background:#f6f8fc;
+            color:#8490a3;
+            padding:14px 12px;
+            font-size:10px;
+            text-align:left;
+        }
+        .company-table td {
+            padding:14px 12px;
+            border-bottom:1px solid #edf0f5;
+            font-size:11px;
+            color:#64718a;
+        }
+        .company-name b {
+            display:block;
+            color:#34415a;
+            font-size:11px;
+        }
+        .company-name small {
+            color:#99a1b0;
+        }
+        .company-actions {
+            display:flex;
+            gap:6px;
+        }
+        .company-actions button {
+            padding:7px 10px;
+            font-size:10px;
+            border-radius:7px;
+        }
+        .edit-company {
+            background:#eaf0ff;
+            color:#5268d6;
+        }
+        .delete-company {
+            background:#fde8e7;
+            color:#b42318;
+        }
+        .company-status {
+            display:inline-block;
+            padding:6px 10px;
+            border-radius:20px;
+            background:#e5f7ef;
+            color:#18865f;
+            font-size:9px;
+            font-weight:700;
+        }
+        .company-message {
+            display:none;
+            padding:12px;
+            margin-bottom:12px;
+            border-radius:8px;
+            font-size:11px;
+        }
+        .company-message.error {
+            display:block;
+            background:#fde8e7;
+            color:#b42318;
+        }
+        .company-message.loading {
+            display:block;
+            background:#eaf0ff;
+            color:#344fba;
+        }
+        .company-empty {
+            display:none;
+            text-align:center;
+            padding:25px;
+            color:#8993a5;
+        }
+        @media(max-width:1000px) {
+            .company-stats {
+                grid-template-columns:repeat(2,minmax(0,1fr));
+            }
+        }
+        @media(max-width:700px) {
+            .company-toolbar {
+                flex-direction:column;
+            }
+            .company-toolbar input {
+                width:100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>
+                <b>RecruitIQ</b>
+                <small>PLACEMENT SYSTEM</small>
+            </span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav>
+            <a href="dashboard.html"><span class="nav-icon">▦</span> Dashboard</a>
+            <a href="candidates.html"><span class="nav-icon">♟</span> Candidates</a>
+            <a href="companies.html" class="active"><span class="nav-icon">▣</span> Companies</a>
+            <a href="jobs.html"><span class="nav-icon">▤</span> Jobs</a>
+            <a href="applications.html"><span class="nav-icon">▧</span> Applications</a>
+            <a href="interviews.html"><span class="nav-icon">◷</span> Interviews</a>
+            <a href="placement-process.html"><span class="nav-icon">◎</span> Placement Process</a>
+            <a href="reports.html"><span class="nav-icon">▥</span> Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-help">
+                <div class="help-icon">✦</div>
+                <b>Placement Support</b>
+                <p>Manage your recruitment activities efficiently.</p>
+            </div>
+            <a class="logout" href="/logout">â†ª Logout</a>
+        </div>
+
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT / COMPANIES</p>
+                <h1>Companies</h1>
+                <p>Manage and monitor recruiting companies.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span>
+                    <b>Admin User</b>
+                    <small>Placement Officer</small>
+                </span>
+            </div>
+        </header>
+
+        <!-- STATISTICS -->
+        <section class="company-stats">
+
+            <article class="company-stat">
+                <small>Total Companies</small>
+                <strong id="totalCompanies">0</strong>
+                <span>Registered companies</span>
+            </article>
+
+            <article class="company-stat">
+                <small>Active Companies</small>
+                <strong id="activeCompanies">0</strong>
+                <span>Currently active</span>
+            </article>
+
+            <article class="company-stat">
+                <small>Open Positions</small>
+                <strong id="openPositions">0</strong>
+                <span>Available positions</span>
+            </article>
+
+            <article class="company-stat">
+                <small>Company Locations</small>
+                <strong id="companyLocations">0</strong>
+                <span>Unique locations</span>
+            </article>
+
+        </section>
+
+        <!-- SEARCH AND ADD -->
+        <div class="company-toolbar">
+
+            <input
+                type="search"
+                id="companySearch"
+                placeholder="Search company name, email or location..."
+            >
+
+            <a href="company-form.html" class="button">
+                + Add New Company
+            </a>
+
+        </div>
+
+        <!-- COMPANY DIRECTORY -->
+        <section class="company-panel">
+
+            <div class="company-heading">
+                <div>
+                    <h2>Company Directory</h2>
+                    <p>Live records fetched from MySQL.</p>
+                </div>
+
+                <span class="badge blue" id="companyCount">
+                    Loading...
+                </span>
+            </div>
+
+            <div id="companyMessage" class="company-message"></div>
+
+            <div class="table-wrap">
+                <table class="company-table">
+
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Location</th>
+                            <th>Contact Person</th>
+                            <th>Email</th>
+                            <th>Open Jobs</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="companyRows"></tbody>
+
+                </table>
+
+                <div id="companyEmpty" class="company-empty">
+                    No companies found.
+                </div>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            Â© 2026 RecruitIQ Â· Recruitment & Placement Management System
+        </footer>
+
+    </main>
+</div>
+
+<script>
+
+    let allCompanies = [];
+
+    const companyRows = document.getElementById("companyRows");
+    const searchInput = document.getElementById("companySearch");
+    const message = document.getElementById("companyMessage");
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    }
+
+    function initials(name) {
+        return String(name || "NA")
+            .trim()
+            .split(/\s+/)
+            .slice(0,2)
+            .map(x => x[0].toUpperCase())
+            .join("");
+    }
+
+    function updateStatistics(data) {
+
+        document.getElementById("totalCompanies").textContent =
+            data.length;
+
+        document.getElementById("activeCompanies").textContent =
+            data.filter(c => c.company_status === "Active").length;
+
+        document.getElementById("openPositions").textContent =
+            data.reduce((sum,c) => sum + Number(c.open_jobs || 0),0);
+
+        const locations = new Set(
+            data.map(c => (c.location || "").toLowerCase().trim())
+                .filter(Boolean)
+        );
+
+        document.getElementById("companyLocations").textContent =
+            locations.size;
+    }
+
+    function displayCompanies(data) {
+
+        companyRows.innerHTML = "";
+
+        data.forEach(company => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>
+                    <div class="company-name">
+                        <b>${escapeHTML(company.company_name)}</b>
+                        <small>
+                            ID: COM${String(company.company_id).padStart(3,"0")}
+                        </small>
+                    </div>
+                </td>
+
+                <td>${escapeHTML(company.location || "â€”")}</td>
+                <td>${escapeHTML(company.contact_person || "â€”")}</td>
+                <td>${escapeHTML(company.email || "â€”")}</td>
+                <td>${Number(company.open_jobs || 0)}</td>
+
+                <td>
+                    <span class="company-status">
+                        ${escapeHTML(company.company_status || "Active")}
+                    </span>
+                </td>
+
+                <td>
+                    <div class="company-actions">
+                        <button class="edit-company"
+                            data-id="${company.company_id}">
+                            Edit
+                        </button>
+
+                        <button class="delete-company"
+                            data-id="${company.company_id}">
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            companyRows.appendChild(row);
+        });
+
+        document.getElementById("companyCount").textContent =
+            data.length + " Companies";
+
+        document.getElementById("companyEmpty").style.display =
+            data.length === 0 ? "block" : "none";
+    }
+
+    function filterCompanies() {
+
+        const search = searchInput.value.toLowerCase().trim();
+
+        const filtered = allCompanies.filter(c => {
+
+            const text = [
+                c.company_name,
+                c.email,
+                c.contact_person,
+                c.location,
+                c.mobile
+            ].join(" ").toLowerCase();
+
+            return text.includes(search);
+        });
+
+        displayCompanies(filtered);
+    }
+
+    async function loadCompanies() {
+
+        message.className = "company-message loading";
+        message.textContent = "Loading companies...";
+
+        try {
+
+            const response = await fetch("/api/companies");
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to load companies.");
+            }
+
+            allCompanies = result.companies || [];
+
+            updateStatistics(allCompanies);
+            filterCompanies();
+
+            message.className = "company-message";
+            message.textContent = "";
+
+        } catch (error) {
+
+            message.className = "company-message error";
+            message.textContent = error.message;
+
+        }
+    }
+
+    /* EDIT AND DELETE BUTTONS */
+
+    companyRows.addEventListener("click", async function(event) {
+
+        const editButton = event.target.closest(".edit-company");
+        const deleteButton = event.target.closest(".delete-company");
+
+        if (editButton) {
+
+            const id = editButton.dataset.id;
+
+            const company = allCompanies.find(
+                c => String(c.company_id) === id
+            );
+
+            if (!company) return;
+
+            const name = prompt("Company Name:", company.company_name);
+            if (name === null || !name.trim()) return;
+
+            const contact = prompt(
+                "Contact Person:",
+                company.contact_person || ""
+            );
+            if (contact === null) return;
+
+            const email = prompt("Email:", company.email || "");
+            if (email === null) return;
+
+            const mobile = prompt("Mobile Number:", company.mobile || "");
+            if (mobile === null) return;
+
+            const location = prompt("Location:", company.location || "");
+            if (location === null) return;
+
+            if (mobile.trim() && !/^[0-9]{10}$/.test(mobile.trim())) {
+                alert("Mobile number must contain exactly 10 digits.");
+                return;
+            }
+
+            try {
+
+                const response = await fetch("/api/companies/" + id, {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        company_name: name.trim(),
+                        contact_person: contact.trim(),
+                        email: email.trim(),
+                        mobile: mobile.trim(),
+                        location: location.trim()
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message);
+                }
+
+                alert("Company updated successfully!");
+                await loadCompanies();
+
+            } catch(error) {
+                alert(error.message);
+            }
+        }
+
+        if (deleteButton) {
+
+            const id = deleteButton.dataset.id;
+
+            const confirmed = confirm(
+                "Are you sure you want to delete this company?"
+            );
+
+            if (!confirmed) return;
+
+            try {
+
+                const response = await fetch("/api/companies/" + id, {
+                    method: "DELETE"
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message);
+                }
+
+                alert("Company deleted successfully!");
+                await loadCompanies();
+
+            } catch(error) {
+                alert(error.message);
+            }
+        }
+
+    });
+
+    searchInput.addEventListener("input", filterCompanies);
+
+    loadCompanies();
+
+</script>
+
+</body>
+</html>
+

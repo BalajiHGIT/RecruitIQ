@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Screening | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="resume-screening-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>RecruitIQ</span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="companies.html">Companies</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="applications.html">Applications</a>
+            <a href="placements.html">Placements</a>
+            <a href="interviews.html">Interviews</a>
+            <a href="reports.html">Reports</a>
+            <a href="resume-screening.html" class="active">
+                🤖 AI Resume Screening
+            </a>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>AI Resume Screening</h1>
+                <p>Upload resumes and analyze job skill matching.</p>
+            </div>
+        </header>
+
+        <section class="dashboard-panel">
+            <h2>Upload Candidate Resume</h2>
+            <p>Select candidate, job and resume to calculate the matching score.</p>
+
+            <form id="resumeForm">
+
+                <label for="candidateId">Candidate ID</label>
+                <input type="number" id="candidateId"
+                       placeholder="Enter Candidate ID" min="1" required>
+
+                <label for="jobId">Job ID</label>
+                <input type="number" id="jobId"
+                       placeholder="Enter Job ID" min="1" required>
+
+                <label for="resumeFile">Resume (PDF or DOCX)</label>
+                <input type="file" id="resumeFile"
+                       accept=".pdf,.docx" required>
+
+                <button type="submit" id="uploadButton">
+                    Upload & Screen Resume
+                </button>
+
+            </form>
+
+            <p id="message"></p>
+        </section>
+
+        <section class="dashboard-panel">
+            <h2>Screening Result</h2>
+
+            <div id="result">
+                <p>No resume screened yet.</p>
+            </div>
+        </section>
+
+        <section class="dashboard-panel">
+            <h2>Resume Screening History</h2>
+
+            <button type="button" id="refreshButton">
+                Refresh History
+            </button>
+
+            <div id="history">
+                Loading screening history...
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/resume-screening.js"></script>
+
+</body>
+</html>

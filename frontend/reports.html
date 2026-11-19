@@ -1,0 +1,210 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reports | Placement Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+    <aside class="sidebar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span><b>Placement</b><small>MANAGEMENT</small></span>
+        </a>
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="companies.html">Companies</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="applications.html">Applications</a>
+            <a href="interviews.html">Interviews</a>
+            <a href="offers.html">Offers</a>
+            <a href="placements.html">Placements</a>
+            <a href="placement-process.html">Placement Process</a>
+            <a href="reports.html" class="active">Reports</a>
+        </nav>
+        <a class="logout" href="/logout">Logout</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+                <h1>Reports</h1>
+                <p>Live management reports from database.</p>
+            </div>
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span><b>Admin User</b><small>Placement Officer</small></span>
+            </div>
+        </header>
+
+        <div class="stats">
+            <article><span>Total Candidates</span><strong id="candidates">0</strong></article>
+            <article><span>Total Companies</span><strong id="companies">0</strong></article>
+            <article><span>Total Jobs</span><strong id="jobs">0</strong></article>
+            <article><span>Applications</span><strong id="applications">0</strong></article>
+            <article><span>Shortlisted</span><strong id="shortlisted">0</strong></article>
+            <article><span>Selected</span><strong id="selected">0</strong></article>
+            <article><span>Total Interviews</span><strong id="interviews">0</strong></article>
+            <article><span>Total Offers</span><strong id="offers">0</strong></article>
+            <article><span>Accepted Offers</span><strong id="accepted">0</strong></article>
+            <article><span>Total Placements</span><strong id="placements">0</strong></article>
+            <article><span>Joined</span><strong id="joined">0</strong></article>
+            <article><span>Placement Rate</span><strong id="rate">0%</strong></article>
+        </div>
+
+        <!-- REPORT CHARTS -->
+<section class="charts-grid">
+    <article class="panel">
+        <h2>Recruitment Overview</h2>
+        <div id="recruitmentChart" class="chart-bars"></div>
+    </article>
+
+    <article class="panel">
+        <h2>Placement Overview</h2>
+        <div id="placementChart" class="chart-bars"></div>
+    </article>
+</section>
+
+<style>
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+}
+
+.chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.chart-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 35px;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.chart-track {
+    height: 12px;
+    background: #edf0f5;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.chart-fill {
+    height: 100%;
+    background: #5276e8;
+    border-radius: 20px;
+    min-width: 0;
+}
+
+@media (max-width: 800px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+        <section class="panel">
+            <h2>Available Reports</h2>
+            <ul>
+                <li>Candidate registration summary</li>
+                <li>Company-wise job openings</li>
+                <li>Application status summary</li>
+                <li>Interview round results</li>
+                <li>Offer acceptance and joining report</li>
+                <li>Final placement history</li>
+            </ul>
+            <p class="muted" id="message">Loading live database reports...</p>
+        </section>
+
+        <footer class="footer">Recruitment & Placement Management System</footer>
+    </main>
+</div>
+
+<script>
+async function loadReports() {
+    const message = document.getElementById("message");
+
+    try {
+        const response = await fetch("/api/reports");
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to load reports");
+        }
+
+        const report = result.report;
+
+        document.getElementById("candidates").textContent = report.total_candidates ?? 0;
+        document.getElementById("companies").textContent = report.total_companies ?? 0;
+        document.getElementById("jobs").textContent = report.total_jobs ?? 0;
+        document.getElementById("applications").textContent = report.total_applications ?? 0;
+        document.getElementById("shortlisted").textContent = report.shortlisted ?? 0;
+        document.getElementById("selected").textContent = report.selected ?? 0;
+        document.getElementById("interviews").textContent = report.total_interviews ?? 0;
+        document.getElementById("offers").textContent = report.total_offers ?? 0;
+        document.getElementById("accepted").textContent = report.accepted_offers ?? 0;
+        document.getElementById("placements").textContent = report.total_placements ?? 0;
+        document.getElementById("joined").textContent = report.joined ?? 0;
+        document.getElementById("rate").textContent = (report.placement_rate ?? 0) + "%";
+
+        // Render Recruitment Chart
+function renderChart(elementId, items) {
+    const container = document.getElementById(elementId);
+    const maxValue = Math.max(...items.map(item => item.value), 1);
+
+    container.innerHTML = items.map(item => {
+        const width = (item.value / maxValue) * 100;
+
+        return `
+            <div class="chart-row">
+                <span>${item.label}</span>
+                <div class="chart-track">
+                    <div class="chart-fill" style="width:${width}%"></div>
+                </div>
+                <b>${item.value}</b>
+            </div>
+        `;
+    }).join("");
+}
+
+renderChart("recruitmentChart", [
+    { label: "Candidates", value: report.total_candidates ?? 0 },
+    { label: "Companies", value: report.total_companies ?? 0 },
+    { label: "Jobs", value: report.total_jobs ?? 0 },
+    { label: "Applications", value: report.total_applications ?? 0 },
+    { label: "Interviews", value: report.total_interviews ?? 0 }
+]);
+
+renderChart("placementChart", [
+    { label: "Shortlisted", value: report.shortlisted ?? 0 },
+    { label: "Selected", value: report.selected ?? 0 },
+    { label: "Offers", value: report.total_offers ?? 0 },
+    { label: "Accepted", value: report.accepted_offers ?? 0 },
+    { label: "Placements", value: report.total_placements ?? 0 },
+    { label: "Joined", value: report.joined ?? 0 }
+]);
+
+        message.textContent = "Reports loaded successfully from MySQL database.";
+
+
+    } catch (error) {
+        message.textContent = "Error loading reports: " + error.message;
+    }
+}
+
+loadReports();
+</script>
+</body>
+</html>

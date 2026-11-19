@@ -1,0 +1,563 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Candidate | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .candidate-form-page {
+            background: #f4f6fc;
+        }
+
+        .form-breadcrumb {
+            color: #79869d;
+            font-size: 11px;
+            margin-bottom: 18px;
+        }
+
+        .form-breadcrumb a {
+            color: #5268e8;
+            font-weight: 600;
+        }
+
+        .registration-card {
+            background: white;
+            padding: 28px;
+            border: 1px solid #e4eaf2;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #28375c08;
+        }
+
+        .registration-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid #edf0f5;
+            margin-bottom: 24px;
+        }
+
+        .registration-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #e9efff;
+            color: #5268e8;
+            font-size: 23px;
+        }
+
+        .registration-heading h2 {
+            margin: 0;
+            font-size: 17px;
+            color: #25314b;
+        }
+
+        .registration-heading p {
+            margin: 5px 0 0;
+            color: #8993a5;
+            font-size: 11px;
+        }
+
+        .form-section-title {
+            grid-column: 1 / -1;
+            color: #5268e8;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #edf0f5;
+            margin-top: 8px;
+        }
+
+        .candidate-fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .candidate-fields label {
+            display: grid;
+            gap: 8px;
+            color: #475467;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .candidate-fields input,
+        .candidate-fields select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #dfe5ef;
+            border-radius: 8px;
+            background: #fbfcff;
+            color: #26344c;
+            font-size: 12px;
+        }
+
+        .candidate-fields input:focus,
+        .candidate-fields select:focus {
+            outline: 2px solid #dce4ff;
+            border-color: #7589ed;
+            background: white;
+        }
+
+        .field-help {
+            color: #9aa3b3;
+            font-size: 9px;
+            font-weight: 400;
+        }
+
+        .full-width-field {
+            grid-column: 1 / -1;
+        }
+
+        .registration-actions {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 11px;
+            padding-top: 23px;
+            margin-top: 23px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .cancel-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 19px;
+            background: #f0f2f7;
+            color: #536078;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .save-btn {
+            padding: 12px 22px;
+            background: linear-gradient(110deg, #5268e8, #8064df);
+            color: white;
+            border-radius: 8px;
+            border: 0;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .save-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .form-message {
+            display: none;
+            margin-top: 17px;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .form-message.success {
+            display: block;
+            background: #e5f7ef;
+            color: #167344;
+        }
+
+        .form-message.error {
+            display: block;
+            background: #fde8e7;
+            color: #b42318;
+        }
+
+        .required-mark {
+            color: #e05252;
+        }
+
+        @media(max-width: 700px) {
+            .registration-card {
+                padding: 17px;
+            }
+
+            .candidate-fields {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .full-width-field,
+            .form-section-title {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="candidate-form-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>
+                <b>RecruitIQ</b>
+                <small>PLACEMENT SYSTEM</small>
+            </span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span class="nav-icon">▦</span> Dashboard
+            </a>
+
+            <a href="candidates.html" class="active">
+                <span class="nav-icon">♟</span> Candidates
+            </a>
+
+            <a href="companies.html">
+                <span class="nav-icon">▣</span> Companies
+            </a>
+
+            <a href="jobs.html">
+                <span class="nav-icon">▤</span> Jobs
+            </a>
+
+            <a href="applications.html">
+                <span class="nav-icon">▧</span> Applications
+            </a>
+
+            <a href="interviews.html">
+                <span class="nav-icon">◷</span> Interviews
+            </a>
+
+            <a href="placement-process.html">
+                <span class="nav-icon">◎</span> Placement Process
+            </a>
+
+            <a href="reports.html">
+                <span class="nav-icon">▥</span> Reports
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-help">
+                <div class="help-icon">✦</div>
+                <b>Placement Support</b>
+                <p>Manage your recruitment activities efficiently.</p>
+            </div>
+
+            <a class="logout" href="/logout">
+                <span class="nav-icon">â†ª</span> Logout
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT / CANDIDATES</p>
+                <h1>Add New Candidate</h1>
+                <p>Register and manage a new student profile.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span>
+                    <b>Admin User</b>
+                    <small>Placement Officer</small>
+                </span>
+            </div>
+        </header>
+
+        <div class="form-breadcrumb">
+            <a href="dashboard.html">Dashboard</a>
+            /
+            <a href="candidates.html">Candidates</a>
+            / Add Candidate
+        </div>
+
+        <!-- REGISTRATION FORM -->
+        <section class="registration-card">
+
+            <div class="registration-heading">
+                <div class="registration-icon">♟</div>
+
+                <div>
+                    <h2>Candidate Registration</h2>
+                    <p>Enter the candidate's personal and academic details.</p>
+                </div>
+            </div>
+
+            <form id="candidateForm">
+
+                <div class="candidate-fields">
+
+                    <div class="form-section-title">
+                        PERSONAL INFORMATION
+                    </div>
+
+                    <label>
+                        Full Name <span class="required-mark">*</span>
+                        <input
+                            type="text"
+                            name="full_name"
+                            id="full_name"
+                            placeholder="Enter candidate full name"
+                            maxlength="120"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Email Address <span class="required-mark">*</span>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            placeholder="example@gmail.com"
+                            maxlength="150"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Mobile Number <span class="required-mark">*</span>
+                        <input
+                            type="tel"
+                            name="mobile"
+                            id="mobile"
+                            placeholder="Enter 10-digit mobile number"
+                            pattern="[0-9]{10}"
+                            maxlength="10"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Qualification
+                        <select name="qualification" id="qualification">
+                            <option value="">Select Qualification</option>
+                            <option value="BCA">BCA</option>
+                            <option value="BCS">BCS</option>
+                            <option value="BSc CS">BSc Computer Science</option>
+                            <option value="BSc IT">BSc IT</option>
+                            <option value="MCA">MCA</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </label>
+
+                    <div class="form-section-title">
+                        ACADEMIC INFORMATION
+                    </div>
+
+                    <label>
+                        Percentage
+                        <input
+                            type="number"
+                            name="percentage"
+                            id="percentage"
+                            placeholder="Enter percentage"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                        >
+                    </label>
+
+                    <label>
+                        Passing Year
+                        <input
+                            type="number"
+                            name="passing_year"
+                            id="passing_year"
+                            placeholder="e.g. 2026"
+                            min="1950"
+                            max="2100"
+                        >
+                    </label>
+
+                    <label>
+                        Number of Backlogs
+                        <input
+                            type="number"
+                            name="backlogs"
+                            id="backlogs"
+                            value="0"
+                            min="0"
+                            step="1"
+                        >
+                    </label>
+
+                    <label>
+                        Technology
+                        <select name="technology" id="technology">
+                            <option value="">Select Technology</option>
+                            <option value="Python">Python</option>
+                            <option value="Java">Java</option>
+                            <option value="JavaScript">JavaScript</option>
+                            <option value=".NET">.NET</option>
+                            <option value="Data Analytics">Data Analytics</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </label>
+
+                    <label class="full-width-field">
+                        Technical Skills
+                        <input
+                            type="text"
+                            name="skills"
+                            id="skills"
+                            placeholder="Python, Django, SQL, MySQL"
+                        >
+                        <small class="field-help">
+                            Separate multiple skills using commas.
+                        </small>
+                    </label>
+
+                </div>
+
+                <div id="formMessage" class="form-message"
+                     role="status" aria-live="polite"></div>
+
+                <div class="registration-actions">
+
+                    <a href="candidates.html" class="cancel-btn">
+                        Cancel
+                    </a>
+
+                    <button type="reset" class="cancel-btn">
+                        Reset Form
+                    </button>
+
+                    <button type="submit" class="save-btn">
+                        ✓ Save Candidate
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <footer class="footer">
+            Â© 2026 RecruitIQ Â· Recruitment & Placement Management System
+        </footer>
+
+    </main>
+</div>
+
+<!-- FLASK API INTEGRATION -->
+<script>
+    const form = document.getElementById("candidateForm");
+    const message = document.getElementById("formMessage");
+
+    function showMessage(text, type) {
+        message.textContent = text;
+        message.className = "form-message " + type;
+    }
+
+    form.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        if (!form.reportValidity()) {
+            return;
+        }
+
+        const payload = {
+            full_name: document.getElementById("full_name").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            mobile: document.getElementById("mobile").value.trim(),
+
+            qualification:
+                document.getElementById("qualification").value,
+
+            percentage:
+                document.getElementById("percentage").value === ""
+                ? null
+                : Number(document.getElementById("percentage").value),
+
+            passing_year:
+                document.getElementById("passing_year").value === ""
+                ? null
+                : Number(document.getElementById("passing_year").value),
+
+            technology:
+                document.getElementById("technology").value,
+
+            skills:
+                document.getElementById("skills").value.trim(),
+
+            backlogs:
+                Number(document.getElementById("backlogs").value)
+        };
+
+        const saveButton = form.querySelector(".save-btn");
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch("/api/candidates", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                showMessage(
+                    result.message || "Could not save candidate.",
+                    "error"
+                );
+                return;
+            }
+
+            form.reset();
+
+            showMessage(
+                result.message + " Candidate ID: " + result.candidate_id,
+                "success"
+            );
+
+        } catch (error) {
+
+            showMessage(
+                "Server connection failed. Please check Flask Server.",
+                "error"
+            );
+
+        } finally {
+
+            saveButton.disabled = false;
+            saveButton.textContent = "✓ Save Candidate";
+
+        }
+
+    });
+
+    form.addEventListener("reset", function() {
+        message.textContent = "";
+        message.className = "form-message";
+    });
+</script>
+
+</body>
+</html>
+
+

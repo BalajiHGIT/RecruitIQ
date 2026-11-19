@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs | Placement Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .job-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin: 22px 0;
+        }
+        .job-stat {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e8eaf0;
+        }
+        .job-stat small { color: #777; }
+        .job-stat h2 { margin: 8px 0 0; font-size: 27px; }
+        .job-toolbar {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            margin: 22px 0;
+            flex-wrap: wrap;
+        }
+        .job-toolbar input {
+            max-width: 350px;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .job-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+        .job-table th, .job-table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .job-table th { background: #f7f8fc; }
+        .job-table td { font-size: 13px; }
+        .job-actions { display: flex; gap: 7px; }
+        .job-actions button {
+            padding: 7px 11px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .edit-btn { background: #e8efff; color: #2455a6; }
+        .delete-btn { background: #ffe9e9; color: #c0392b; }
+        .status-pill {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: #e5f8ec;
+            color: #168044;
+        }
+        .status-closed { background: #ffe9e9; color: #c0392b; }
+        .status-hold { background: #fff2d8; color: #a66a00; }
+        .message {
+            padding: 13px;
+            margin: 12px 0;
+            border-radius: 8px;
+            display: none;
+        }
+        .error-message { background: #ffe9e9; color: #b42318; }
+        .success-message { background: #e5f8ec; color: #168044; }
+        @media(max-width: 700px) {
+            .job-stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app-shell">
+
+    <aside class="sidebar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span><b>Placement</b><small>MANAGEMENT</small></span>
+        </a>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="companies.html">Companies</a>
+            <a href="jobs.html" class="active">Jobs</a>
+            <a href="applications.html">Applications</a>
+            <a href="interviews.html">Interviews</a>
+            <a href="placement-process.html">Placement Process</a>
+            <a href="reports.html">Reports</a>
+        </nav>
+
+        <a class="logout" href="/logout">Logout</a>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+                <h1>Jobs</h1>
+                <p>Manage job openings and eligibility criteria.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span><b>Admin User</b><small>Placement Officer</small></span>
+            </div>
+        </header>
+
+        <div class="job-stats">
+            <div class="job-stat">
+                <small>Total Jobs</small>
+                <h2 id="totalJobs">0</h2>
+            </div>
+            <div class="job-stat">
+                <small>Open Jobs</small>
+                <h2 id="openJobs">0</h2>
+            </div>
+            <div class="job-stat">
+                <small>Closed / On Hold</small>
+                <h2 id="otherJobs">0</h2>
+            </div>
+        </div>
+
+        <div id="successMessage" class="message success-message"></div>
+        <div id="errorMessage" class="message error-message"></div>
+
+        <div class="job-toolbar">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search job title or company..."
+            >
+
+            <div style="display:flex;gap:10px;">
+                <button class="button" onclick="loadJobs()">Refresh</button>
+                <a class="button" href="job-form.html">+ Add Job</a>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="job-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Job Title</th>
+                        <th>Company</th>
+                        <th>Qualification</th>
+                        <th>Min %</th>
+                        <th>Openings</th>
+                        <th>Package (LPA)</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="jobsTable">
+                    <tr>
+                        <td colspan="10">Loading jobs...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="footer">
+            Recruitment & Placement Management System
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    const API_URL = "/api/jobs";
+    let allJobs = [];
+
+    function showMessage(type, message) {
+        const box = document.getElementById(
+            type === "success" ? "successMessage" : "errorMessage"
+        );
+
+        const other = document.getElementById(
+            type === "success" ? "errorMessage" : "successMessage"
+        );
+
+        other.style.display = "none";
+        box.textContent = message;
+        box.style.display = "block";
+
+        setTimeout(() => {
+            box.style.display = "none";
+        }, 4000);
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[char]);
+    }
+
+    async function loadJobs() {
+        const table = document.getElementById("jobsTable");
+        table.innerHTML = '<tr><td colspan="10">Loading jobs...</td></tr>';
+
+        try {
+            const response = await fetch(API_URL);
+            const result = await response.json();
+
+            if (!response.ok || result.success === false) {
+                throw new Error(result.message || "Unable to load jobs.");
+            }
+
+            allJobs = result.jobs || [];
+
+            document.getElementById("totalJobs").textContent = allJobs.length;
+
+            document.getElementById("openJobs").textContent =
+                allJobs.filter(job => job.job_status === "Open").length;
+
+            document.getElementById("otherJobs").textContent =
+                allJobs.filter(job => job.job_status !== "Open").length;
+
+            displayJobs(allJobs);
+
+        } catch (error) {
+            table.innerHTML =
+                '<tr><td colspan="10">Unable to load jobs. Please check server.</td></tr>';
+
+            showMessage("error", error.message);
+        }
+    }
+
+    function displayJobs(jobs) {
+        const table = document.getElementById("jobsTable");
+
+        if (jobs.length === 0) {
+            table.innerHTML =
+                '<tr><td colspan="10">No jobs found. Click Add Job to create one.</td></tr>';
+            return;
+        }
+
+        table.innerHTML = jobs.map(job => {
+            let statusClass = "";
+
+            if (job.job_status === "Closed") {
+                statusClass = "status-closed";
+            } else if (job.job_status === "On Hold") {
+                statusClass = "status-hold";
+            }
+
+            const packageText =
+                (job.min_package ?? "-") + " - " + (job.max_package ?? "-");
+
+            return `
+                <tr>
+                    <td>${escapeHTML(job.job_id)}</td>
+                    <td><b>${escapeHTML(job.job_title)}</b></td>
+                    <td>${escapeHTML(job.company_name || "-")}</td>
+                    <td>${escapeHTML(job.qualification_required || "-")}</td>
+                    <td>${escapeHTML(job.minimum_percentage ?? 0)}%</td>
+                    <td>${escapeHTML(job.openings ?? 0)}</td>
+                    <td>${escapeHTML(packageText)}</td>
+                    <td>${escapeHTML(job.deadline || "-")}</td>
+                    <td>
+                        <span class="status-pill ${statusClass}">
+                            ${escapeHTML(job.job_status)}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="job-actions">
+                            <button class="edit-btn"
+                                onclick="editJob(${Number(job.job_id)})">
+                                Edit
+                            </button>
+                            <button class="delete-btn"
+                                onclick="deleteJob(${Number(job.job_id)})">
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function() {
+        const search = this.value.toLowerCase().trim();
+
+        const filtered = allJobs.filter(job =>
+            (job.job_title || "").toLowerCase().includes(search) ||
+            (job.company_name || "").toLowerCase().includes(search)
+        );
+
+        displayJobs(filtered);
+    });
+
+    async function editJob(id) {
+        const job = allJobs.find(item => Number(item.job_id) === id);
+
+        if (!job) return;
+
+        const newTitle = prompt("Enter Job Title:", job.job_title);
+        if (newTitle === null) return;
+
+        if (!newTitle.trim()) {
+            showMessage("error", "Job title cannot be empty.");
+            return;
+        }
+
+        const newOpenings = prompt("Enter Number of Openings:", job.openings);
+        if (newOpenings === null) return;
+
+        if (!Number.isInteger(Number(newOpenings)) || Number(newOpenings) <= 0) {
+            showMessage("error", "Openings must be a positive number.");
+            return;
+        }
+
+        const newStatus = prompt(
+            "Enter Status: Open, Closed or On Hold",
+            job.job_status
+        );
+
+        if (newStatus === null) return;
+
+        const validStatuses = ["Open", "Closed", "On Hold"];
+
+        if (!validStatuses.includes(newStatus.trim())) {
+            showMessage("error", "Invalid job status.");
+            return;
+        }
+
+        const updatedJob = {
+            company_id: job.company_id,
+            job_title: newTitle.trim(),
+            openings: Number(newOpenings),
+            qualification_required: job.qualification_required || "",
+            minimum_percentage: job.minimum_percentage ?? 0,
+            passing_year: job.passing_year || null,
+            technology: job.technology || "",
+            required_skills: job.required_skills || "",
+            max_backlogs: job.max_backlogs ?? 0,
+            min_package: job.min_package || null,
+            max_package: job.max_package || null,
+            posted_date: job.posted_date || null,
+            deadline: job.deadline || null,
+            job_status: newStatus.trim()
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedJob)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || result.success === false) {
+                throw new Error(result.message || "Unable to update job.");
+            }
+
+            showMessage("success", "Job updated successfully!");
+            loadJobs();
+
+        } catch (error) {
+            showMessage("error", error.message);
+        }
+    }
+
+    async function deleteJob(id) {
+        const confirmDelete = confirm(
+            "Are you sure you want to delete Job ID " + id + "?"
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: "DELETE"
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || result.success === false) {
+                throw new Error(result.message || "Unable to delete job.");
+            }
+
+            showMessage("success", "Job deleted successfully!");
+            loadJobs();
+
+        } catch (error) {
+            showMessage("error", error.message);
+        }
+    }
+
+    loadJobs();
+</script>
+
+</body>
+</html>

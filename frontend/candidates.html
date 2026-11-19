@@ -1,0 +1,619 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .candidate-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .candidate-stat {
+            background: white;
+            border: 1px solid #e4eaf2;
+            border-radius: 13px;
+            padding: 19px;
+            box-shadow: 0 3px 12px #28375c08;
+        }
+
+        .candidate-stat small {
+            display: block;
+            color: #8490a3;
+            font-size: 11px;
+            margin-bottom: 12px;
+        }
+
+        .candidate-stat strong {
+            font-size: 27px;
+            color: #1c2943;
+        }
+
+        .candidate-stat span {
+            display: block;
+            color: #8993a5;
+            font-size: 10px;
+            margin-top: 7px;
+        }
+
+        .candidate-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .candidate-search {
+            display: flex;
+            flex: 1;
+            max-width: 620px;
+            gap: 10px;
+        }
+
+        .candidate-search input {
+            flex: 1;
+        }
+
+        .candidate-search select {
+            width: 145px;
+        }
+
+        .candidate-add-btn {
+            padding: 12px 17px;
+            border-radius: 9px;
+            color: white;
+            background: linear-gradient(110deg, #5268e8, #8064df);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .candidate-add-btn:hover {
+            color: white;
+            text-decoration: none;
+        }
+
+        .candidate-table-panel {
+            background: white;
+            border: 1px solid #e4eaf2;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 3px 12px #28375c08;
+        }
+
+        .candidate-table-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .candidate-table-heading h2 {
+            margin: 0;
+            font-size: 15px;
+            color: #25314b;
+        }
+
+        .candidate-table-heading p {
+            color: #8993a5;
+            font-size: 10px;
+            margin: 5px 0 0;
+        }
+
+        .candidate-table {
+            width: 100%;
+            min-width: 750px;
+            border-collapse: collapse;
+        }
+
+        .candidate-table th {
+            background: #f6f8fc;
+            color: #8490a3;
+            padding: 14px 12px;
+            font-size: 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .candidate-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #edf0f5;
+            color: #64718a;
+            font-size: 11px;
+        }
+
+        .candidate-table tbody tr:hover {
+            background: #fafbff;
+        }
+
+        .candidate-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 155px;
+        }
+
+        .candidate-avatar {
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #e9efff;
+            color: #5268d6;
+            font-weight: 800;
+        }
+
+        .candidate-name b {
+            display: block;
+            color: #34415a;
+            font-size: 11px;
+        }
+
+        .candidate-name small {
+            display: block;
+            color: #99a1b0;
+            font-size: 9px;
+            margin-top: 4px;
+        }
+
+        .candidate-status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .candidate-status.active {
+            background: #e5f7ef;
+            color: #18865f;
+        }
+
+        .candidate-status.placed {
+            background: #e8edff;
+            color: #5268d6;
+        }
+
+        .candidate-status.inactive {
+            background: #fff1e4;
+            color: #cb8145;
+        }
+
+        .candidate-view-btn {
+            display: inline-block;
+            padding: 7px 11px;
+            border-radius: 7px;
+            background: #edf0ff;
+            color: #5268d6;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .candidate-view-btn:hover {
+            background: #dfe5ff;
+            text-decoration: none;
+        }
+
+        .candidate-message {
+            display: none;
+            margin: 12px 0;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .candidate-message.error {
+            display: block;
+            background: #fde8e7;
+            color: #b42318;
+        }
+
+        .candidate-message.loading {
+            display: block;
+            background: #eaf0ff;
+            color: #344fba;
+        }
+
+        .empty-message {
+            display: none;
+            padding: 30px;
+            text-align: center;
+            color: #8993a5;
+            font-size: 12px;
+        }
+
+        .candidate-footer-note {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 16px;
+            color: #929caf;
+            font-size: 10px;
+        }
+
+        @media(max-width: 1000px) {
+            .candidate-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media(max-width: 700px) {
+            .candidate-toolbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .candidate-search {
+                max-width: 100%;
+                flex-direction: column;
+            }
+
+            .candidate-search select {
+                width: 100%;
+            }
+
+            .candidate-add-btn {
+                text-align: center;
+            }
+
+            .candidate-table-panel {
+                padding: 13px;
+            }
+
+            .candidate-footer-note {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>
+                <b>RecruitIQ</b>
+                <small>PLACEMENT SYSTEM</small>
+            </span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav>
+            <a href="dashboard.html"><span class="nav-icon">▦</span> Dashboard</a>
+            <a href="candidates.html" class="active"><span class="nav-icon">♟</span> Candidates</a>
+            <a href="companies.html"><span class="nav-icon">▣</span> Companies</a>
+            <a href="jobs.html"><span class="nav-icon">▤</span> Jobs</a>
+            <a href="applications.html"><span class="nav-icon">▧</span> Applications</a>
+            <a href="interviews.html"><span class="nav-icon">◷</span> Interviews</a>
+            <a href="placement-process.html"><span class="nav-icon">◎</span> Placement Process</a>
+            <a href="reports.html"><span class="nav-icon">▥</span> Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-help">
+                <div class="help-icon">✦</div>
+                <b>Placement Support</b>
+                <p>Manage your recruitment activities efficiently.</p>
+            </div>
+
+            <a class="logout" href="/logout">
+                <span class="nav-icon">â†ª</span> Logout
+            </a>
+        </div>
+
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT / CANDIDATES</p>
+                <h1>Candidates</h1>
+                <p>Manage and track registered student profiles.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span>
+                    <b>Admin User</b>
+                    <small>Placement Officer</small>
+                </span>
+            </div>
+        </header>
+
+        <!-- DATABASE STATISTICS -->
+        <section class="candidate-stats">
+
+            <article class="candidate-stat">
+                <small>Total Candidates</small>
+                <strong id="totalCandidates">0</strong>
+                <span>Registered profiles</span>
+            </article>
+
+            <article class="candidate-stat">
+                <small>Active Candidates</small>
+                <strong id="activeCandidates">0</strong>
+                <span>Currently available</span>
+            </article>
+
+            <article class="candidate-stat">
+                <small>Placed Candidates</small>
+                <strong id="placedCandidates">0</strong>
+                <span>Successfully placed</span>
+            </article>
+
+            <article class="candidate-stat">
+                <small>Inactive Candidates</small>
+                <strong id="inactiveCandidates">0</strong>
+                <span>Inactive profiles</span>
+            </article>
+
+        </section>
+
+        <!-- SEARCH -->
+        <div class="candidate-toolbar">
+
+            <div class="candidate-search">
+
+                <input
+                    type="search"
+                    id="candidateSearch"
+                    placeholder="Search name, email, qualification or technology..."
+                >
+
+                <select id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="placed">Placed</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+
+            </div>
+
+            <a href="candidate-form.html" class="candidate-add-btn">
+                + Add New Candidate
+            </a>
+
+        </div>
+
+        <!-- CANDIDATE TABLE -->
+        <section class="candidate-table-panel">
+
+            <div class="candidate-table-heading">
+                <div>
+                    <h2>Candidate Directory</h2>
+                    <p>Live records fetched from MySQL database.</p>
+                </div>
+
+                <span class="badge blue" id="candidateCount">Loading...</span>
+            </div>
+
+            <div id="candidateMessage" class="candidate-message"></div>
+
+            <div class="table-wrap">
+                <table class="candidate-table">
+
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Email</th>
+                            <th>Qualification</th>
+                            <th>Percentage</th>
+                            <th>Technology</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="candidateRows"></tbody>
+
+                </table>
+
+                <div class="empty-message" id="emptyMessage">
+                    No matching candidates found.
+                </div>
+
+            </div>
+
+            <div class="candidate-footer-note">
+                <span>Live MySQL candidate records</span>
+                <span>RecruitIQ Candidate Management</span>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            Â© 2026 RecruitIQ Â· Recruitment & Placement Management System
+        </footer>
+
+    </main>
+
+</div>
+
+<script>
+    let allCandidates = [];
+
+    const searchInput = document.getElementById("candidateSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const candidateRows = document.getElementById("candidateRows");
+    const candidateCount = document.getElementById("candidateCount");
+    const emptyMessage = document.getElementById("emptyMessage");
+    const messageBox = document.getElementById("candidateMessage");
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, function(char) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[char];
+        });
+    }
+
+    function getInitials(name) {
+        return String(name || "NA")
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map(word => word[0].toUpperCase())
+            .join("");
+    }
+
+    function updateStatistics(candidates) {
+        document.getElementById("totalCandidates").textContent =
+            candidates.length;
+
+        document.getElementById("activeCandidates").textContent =
+            candidates.filter(c => c.candidate_status === "Active").length;
+
+        document.getElementById("placedCandidates").textContent =
+            candidates.filter(c => c.candidate_status === "Placed").length;
+
+        document.getElementById("inactiveCandidates").textContent =
+            candidates.filter(c => c.candidate_status === "Inactive").length;
+    }
+
+    function displayCandidates(candidates) {
+        candidateRows.innerHTML = "";
+
+        candidates.forEach(candidate => {
+            const status = String(
+                candidate.candidate_status || "Active"
+            ).toLowerCase();
+
+            const statusClass =
+                ["active", "placed", "inactive"].includes(status)
+                ? status : "inactive";
+
+            const percentage =
+                candidate.percentage === null ||
+                candidate.percentage === undefined
+                ? "â€”"
+                : Number(candidate.percentage).toFixed(2) + "%";
+
+            const row = document.createElement("tr");
+
+            row.dataset.status = statusClass;
+
+            row.innerHTML = `
+                <td>
+                    <div class="candidate-name">
+                        <span class="candidate-avatar">
+                            ${escapeHTML(getInitials(candidate.full_name))}
+                        </span>
+                        <span>
+                            <b>${escapeHTML(candidate.full_name)}</b>
+                            <small>ID: CAN${String(candidate.candidate_id).padStart(3, "0")}</small>
+                        </span>
+                    </div>
+                </td>
+
+                <td>${escapeHTML(candidate.email)}</td>
+                <td>${escapeHTML(candidate.qualification || "â€”")}</td>
+                <td>${escapeHTML(percentage)}</td>
+                <td>${escapeHTML(candidate.technology || "â€”")}</td>
+                <td>
+                    <span class="candidate-status ${statusClass}">
+                        ${escapeHTML(candidate.candidate_status || "Active")}
+                    </span>
+                </td>
+                <td>
+                    <a
+                        href="candidate-details.html?id=${encodeURIComponent(candidate.candidate_id)}"
+                        class="candidate-view-btn"
+                    >View</a>
+                </td>
+            `;
+
+            candidateRows.appendChild(row);
+        });
+
+        candidateCount.textContent = candidates.length + " Candidates";
+
+        emptyMessage.style.display =
+            candidates.length === 0 ? "block" : "none";
+    }
+
+    function filterCandidates() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        const selectedStatus = statusFilter.value;
+
+        const filtered = allCandidates.filter(candidate => {
+            const searchableText = [
+                candidate.full_name,
+                candidate.email,
+                candidate.qualification,
+                candidate.technology,
+                candidate.skills
+            ].join(" ").toLowerCase();
+
+            const status = String(
+                candidate.candidate_status || "Active"
+            ).toLowerCase();
+
+            const matchesSearch = searchableText.includes(searchText);
+            const matchesStatus =
+                selectedStatus === "all" || status === selectedStatus;
+
+            return matchesSearch && matchesStatus;
+        });
+
+        displayCandidates(filtered);
+    }
+
+    async function loadCandidates() {
+        messageBox.className = "candidate-message loading";
+        messageBox.textContent = "Loading candidates from MySQL...";
+        
+        try {
+            const response = await fetch("/api/candidates");
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to load candidates.");
+            }
+
+            allCandidates = result.candidates || [];
+
+            updateStatistics(allCandidates);
+            filterCandidates();
+
+            messageBox.className = "candidate-message";
+            messageBox.textContent = "";
+
+        } catch (error) {
+            messageBox.className = "candidate-message error";
+            messageBox.textContent =
+                "Unable to load candidates. Check that Flask and MySQL are running.";
+
+            candidateCount.textContent = "Error";
+        }
+    }
+
+    searchInput.addEventListener("input", filterCandidates);
+    statusFilter.addEventListener("change", filterCandidates);
+
+    loadCandidates();
+</script>
+
+</body>
+</html>
+
+

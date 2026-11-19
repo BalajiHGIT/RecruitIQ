@@ -1,0 +1,642 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Job | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .job-form-card {
+            padding: 27px;
+            background: white;
+            border: 1px solid #e4eaf2;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #28375c08;
+        }
+
+        .job-form-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 22px;
+            margin-bottom: 23px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .job-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #e9efff;
+            color: #5268e8;
+            font-size: 23px;
+        }
+
+        .job-form-heading h2 {
+            margin: 0;
+            color: #25314b;
+            font-size: 17px;
+        }
+
+        .job-form-heading p {
+            margin: 5px 0 0;
+            color: #8993a5;
+            font-size: 11px;
+        }
+
+        .job-fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .job-section-title {
+            grid-column: 1 / -1;
+            color: #5268e8;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #edf0f5;
+            margin-top: 8px;
+        }
+
+        .job-fields label {
+            display: grid;
+            gap: 8px;
+            color: #475467;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .job-fields input,
+        .job-fields select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #dfe5ef;
+            border-radius: 8px;
+            background: #fbfcff;
+            color: #26344c;
+            font-size: 12px;
+        }
+
+        .job-fields input:focus,
+        .job-fields select:focus {
+            outline: 2px solid #dce4ff;
+            border-color: #7589ed;
+        }
+
+        .job-help {
+            color: #9aa3b3;
+            font-size: 9px;
+            font-weight: 400;
+        }
+
+        .job-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 11px;
+            padding-top: 22px;
+            margin-top: 10px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .job-message {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .job-message.success {
+            display: block;
+            background: #e5f7ef;
+            color: #167344;
+        }
+
+        .job-message.error {
+            display: block;
+            background: #fde8e7;
+            color: #b42318;
+        }
+
+        .job-message.info {
+            display: block;
+            background: #eaf0ff;
+            color: #344fba;
+        }
+
+        .job-save-btn {
+            background: linear-gradient(110deg, #5268e8, #8064df);
+            color: white;
+        }
+
+        .job-save-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .job-cancel-btn {
+            background: #f0f2f7;
+            color: #536078;
+        }
+
+        @media(max-width: 700px) {
+            .job-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .job-section-title,
+            .job-actions,
+            .job-message {
+                grid-column: 1;
+            }
+
+            .job-form-card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>
+                <b>RecruitIQ</b>
+                <small>PLACEMENT SYSTEM</small>
+            </span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span class="nav-icon">▦</span> Dashboard
+            </a>
+            <a href="candidates.html">
+                <span class="nav-icon">♟</span> Candidates
+            </a>
+            <a href="companies.html">
+                <span class="nav-icon">▣</span> Companies
+            </a>
+            <a href="jobs.html" class="active">
+                <span class="nav-icon">▤</span> Jobs
+            </a>
+            <a href="applications.html">
+                <span class="nav-icon">▧</span> Applications
+            </a>
+            <a href="interviews.html">
+                <span class="nav-icon">◷</span> Interviews
+            </a>
+            <a href="placement-process.html">
+                <span class="nav-icon">◎</span> Placement Process
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">▥</span> Reports
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-help">
+                <div class="help-icon">✦</div>
+                <b>Placement Support</b>
+                <p>Manage your recruitment activities efficiently.</p>
+            </div>
+
+            <a class="logout" href="/logout">
+                <span class="nav-icon">â†ª</span> Logout
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT / JOBS</p>
+                <h1>Add New Job</h1>
+                <p>Create a job opening and eligibility requirements.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span>
+                    <b>Admin User</b>
+                    <small>Placement Officer</small>
+                </span>
+            </div>
+        </header>
+
+        <!-- JOB FORM -->
+        <section class="job-form-card">
+
+            <div class="job-form-heading">
+                <div class="job-icon">▤</div>
+                <div>
+                    <h2>Job Registration</h2>
+                    <p>Enter job details, eligibility and package information.</p>
+                </div>
+            </div>
+
+            <form id="jobForm">
+
+                <div class="job-fields">
+
+                    <div class="job-section-title">
+                        COMPANY AND JOB INFORMATION
+                    </div>
+
+                    <label>
+                        Select Company *
+                        <select id="company_id" required>
+                            <option value="">Loading companies...</option>
+                        </select>
+                        <small class="job-help">
+                            Select a registered company.
+                        </small>
+                    </label>
+
+                    <label>
+                        Job Title *
+                        <input
+                            type="text"
+                            id="job_title"
+                            placeholder="Python Developer"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Required Qualification
+                        <input
+                            type="text"
+                            id="qualification_required"
+                            placeholder="BCA, BCS, BSc CS"
+                        >
+                    </label>
+
+                    <label>
+                        Technology
+                        <input
+                            type="text"
+                            id="technology"
+                            placeholder="Python"
+                        >
+                    </label>
+
+                    <label class="job-section-title">
+                        ELIGIBILITY REQUIREMENTS
+                    </label>
+
+                    <label>
+                        Minimum Percentage
+                        <input
+                            type="number"
+                            id="minimum_percentage"
+                            value="60"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                        >
+                    </label>
+
+                    <label>
+                        Required Passing Year
+                        <input
+                            type="number"
+                            id="passing_year"
+                            placeholder="2026"
+                            min="1950"
+                            max="2100"
+                        >
+                        <small class="job-help">
+                            Leave empty if there is no year restriction.
+                        </small>
+                    </label>
+
+                    <label>
+                        Maximum Backlogs
+                        <input
+                            type="number"
+                            id="max_backlogs"
+                            value="0"
+                            min="0"
+                            step="1"
+                        >
+                    </label>
+
+                    <label>
+                        Required Skills
+                        <input
+                            type="text"
+                            id="required_skills"
+                            placeholder="Python, Django, SQL"
+                        >
+                        <small class="job-help">
+                            Separate skills using commas.
+                        </small>
+                    </label>
+
+                    <div class="job-section-title">
+                        PACKAGE AND JOB SCHEDULE
+                    </div>
+
+                    <label>
+                        Number of Openings *
+                        <input
+                            type="number"
+                            id="openings"
+                            value="1"
+                            min="1"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Minimum Package (LPA)
+                        <input
+                            type="number"
+                            id="min_package"
+                            value="3"
+                            min="0"
+                            step="0.1"
+                        >
+                    </label>
+
+                    <label>
+                        Maximum Package (LPA)
+                        <input
+                            type="number"
+                            id="max_package"
+                            value="5"
+                            min="0"
+                            step="0.1"
+                        >
+                    </label>
+
+                    <label>
+                        Posted Date *
+                        <input
+                            type="date"
+                            id="posted_date"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Application Deadline
+                        <input
+                            type="date"
+                            id="deadline"
+                        >
+                    </label>
+
+                    <label>
+                        Job Status
+                        <select id="job_status">
+                            <option value="Open">Open</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </label>
+
+                    <div id="jobMessage"
+                         class="job-message"
+                         role="status"
+                         aria-live="polite"></div>
+
+                    <div class="job-actions">
+                        <a href="jobs.html"
+                           class="button job-cancel-btn">
+                            Cancel
+                        </a>
+
+                        <button type="reset"
+                                class="button job-cancel-btn">
+                            Reset Form
+                        </button>
+
+                        <button type="submit"
+                                class="button job-save-btn">
+                            ✓ Save Job
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+        </section>
+
+        <footer class="footer">
+            Â© 2026 RecruitIQ Â· Recruitment & Placement Management System
+        </footer>
+
+    </main>
+</div>
+
+<script>
+
+    const jobForm = document.getElementById("jobForm");
+    const companyDropdown = document.getElementById("company_id");
+    const jobMessage = document.getElementById("jobMessage");
+
+    function showJobMessage(text, type) {
+        jobMessage.textContent = text;
+        jobMessage.className = "job-message " + type;
+    }
+
+    // Load companies from MySQL
+    async function loadCompanyOptions() {
+
+        companyDropdown.innerHTML =
+            '<option value="">Loading companies...</option>';
+
+        try {
+
+            const response = await fetch("/api/companies");
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to load companies.");
+            }
+
+            companyDropdown.innerHTML =
+                '<option value="">Select Company</option>';
+
+            result.companies.forEach(company => {
+
+                if (company.company_status !== "Active") return;
+
+                const option = document.createElement("option");
+
+                option.value = company.company_id;
+                option.textContent =
+                    company.company_name + " - " +
+                    (company.location || "Location not available");
+
+                companyDropdown.appendChild(option);
+            });
+
+            if (companyDropdown.options.length === 1) {
+                showJobMessage(
+                    "No active companies found. Please register a company first.",
+                    "error"
+                );
+            }
+
+        } catch (error) {
+
+            companyDropdown.innerHTML =
+                '<option value="">Company loading failed</option>';
+
+            showJobMessage(error.message, "error");
+        }
+    }
+
+    // Set default posted date
+    function setTodayDate() {
+
+        const today = new Date();
+        const localDate = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, "0"),
+            String(today.getDate()).padStart(2, "0")
+        ].join("-");
+
+        document.getElementById("posted_date").value = localDate;
+    }
+
+    // Save job to MySQL
+    jobForm.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        if (!jobForm.reportValidity()) return;
+
+        const minPackage = Number(
+            document.getElementById("min_package").value
+        );
+
+        const maxPackage = Number(
+            document.getElementById("max_package").value
+        );
+
+        if (minPackage < 0 || maxPackage < 0 ||
+            minPackage > maxPackage) {
+
+            showJobMessage(
+                "Minimum package cannot exceed maximum package.",
+                "error"
+            );
+            return;
+        }
+
+        const postedDate = document.getElementById("posted_date").value;
+        const deadline = document.getElementById("deadline").value;
+
+        if (deadline && deadline < postedDate) {
+            showJobMessage(
+                "Application deadline cannot be before posted date.",
+                "error"
+            );
+            return;
+        }
+
+        const data = {
+            company_id: Number(companyDropdown.value),
+            job_title: document.getElementById("job_title").value.trim(),
+            qualification_required:
+                document.getElementById("qualification_required").value.trim(),
+            minimum_percentage:
+                Number(document.getElementById("minimum_percentage").value),
+            passing_year:
+                document.getElementById("passing_year").value || null,
+            technology:
+                document.getElementById("technology").value.trim(),
+            required_skills:
+                document.getElementById("required_skills").value.trim(),
+            max_backlogs:
+                Number(document.getElementById("max_backlogs").value),
+            openings:
+                Number(document.getElementById("openings").value),
+            min_package: minPackage,
+            max_package: maxPackage,
+            posted_date: postedDate,
+            deadline: deadline || null,
+            job_status: document.getElementById("job_status").value
+        };
+
+        const button = jobForm.querySelector(".job-save-btn");
+
+        button.disabled = true;
+        button.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch("/api/jobs", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to save job.");
+            }
+
+            jobForm.reset();
+            setTodayDate();
+
+            showJobMessage(
+                result.message + " Job ID: " + result.job_id,
+                "success"
+            );
+
+        } catch (error) {
+
+            showJobMessage(error.message, "error");
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "✓ Save Job";
+
+        }
+    });
+
+    jobForm.addEventListener("reset", function() {
+
+        jobMessage.textContent = "";
+        jobMessage.className = "job-message";
+
+        setTimeout(setTodayDate, 0);
+    });
+
+    setTodayDate();
+    loadCompanyOptions();
+
+</script>
+
+</body>
+</html>
+

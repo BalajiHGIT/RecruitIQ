@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply for Job | Placement Manager</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.form-card{max-width:650px;background:white;padding:28px;border-radius:14px;margin-top:25px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;margin-bottom:8px;font-weight:600}
+.form-group select{width:100%;padding:13px;border:1px solid #ddd;border-radius:8px}
+.submit-btn{padding:12px 24px;border:0;border-radius:8px;background:#3157d5;color:white;cursor:pointer}
+#message{margin-top:16px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+<a class="brand" href="dashboard.html">
+<span class="brand-mark">RI</span>
+<span><b>Placement</b><small>MANAGEMENT</small></span>
+</a>
+<nav>
+<a href="dashboard.html">Dashboard</a>
+<a href="candidates.html">Candidates</a>
+<a href="companies.html">Companies</a>
+<a href="jobs.html">Jobs</a>
+<a href="applications.html" class="active">Applications</a>
+<a href="interviews.html">Interviews</a>
+<a href="placement-process.html">Placement Process</a>
+<a href="reports.html">Reports</a>
+</nav>
+<a class="logout" href="/logout">Logout</a>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+<h1>Apply for Job</h1>
+<p>Submit a candidate's job application.</p>
+</div>
+<div class="user-chip">
+<span class="avatar">A</span>
+<span><b>Admin User</b><small>Placement Officer</small></span>
+</div>
+</header>
+
+<div class="form-card">
+<h2>New Application</h2>
+<form id="applicationForm">
+<div class="form-group">
+<label for="candidate_id">Select Candidate</label>
+<select id="candidate_id" required>
+<option value="">Loading candidates...</option>
+</select>
+</div>
+
+<div class="form-group">
+<label for="job_id">Select Job</label>
+<select id="job_id" required>
+<option value="">Loading jobs...</option>
+</select>
+</div>
+
+<button type="submit" class="submit-btn">Submit Application</button>
+</form>
+<p id="message"></p>
+</div>
+</main>
+</div>
+
+<script>
+async function loadDropdowns() {
+    const candidateSelect = document.getElementById("candidate_id");
+    const jobSelect = document.getElementById("job_id");
+
+    try {
+        const [candidateResponse, jobResponse] = await Promise.all([
+            fetch("/api/candidates"),
+            fetch("/api/jobs")
+        ]);
+
+        const candidateData = await candidateResponse.json();
+        const jobData = await jobResponse.json();
+
+        if (!candidateResponse.ok || !candidateData.success) {
+            throw new Error("Unable to load candidates.");
+        }
+
+        if (!jobResponse.ok || !jobData.success) {
+            throw new Error("Unable to load jobs.");
+        }
+
+        candidateSelect.innerHTML = '<option value="">Choose Candidate</option>';
+
+        (candidateData.candidates || []).forEach(candidate => {
+            if (candidate.candidate_status === "Active") {
+                candidateSelect.innerHTML += `
+                    <option value="${candidate.candidate_id}">
+                        ${escapeHTML(candidate.full_name)} (ID: ${candidate.candidate_id})
+                    </option>`;
+            }
+        });
+
+        jobSelect.innerHTML = '<option value="">Choose Job</option>';
+
+        (jobData.jobs || []).forEach(job => {
+            if (job.job_status === "Open") {
+                jobSelect.innerHTML += `
+                    <option value="${job.job_id}">
+                        ${escapeHTML(job.job_title)} - ${escapeHTML(job.company_name)}
+                        (ID: ${job.job_id})
+                    </option>`;
+            }
+        });
+
+    } catch (error) {
+        candidateSelect.innerHTML = '<option value="">Could not load candidates</option>';
+        jobSelect.innerHTML = '<option value="">Could not load jobs</option>';
+        document.getElementById("message").textContent = error.message;
+    }
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+document.getElementById("applicationForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const candidate_id = document.getElementById("candidate_id").value;
+    const job_id = document.getElementById("job_id").value;
+    const message = document.getElementById("message");
+
+    message.textContent = "Submitting application...";
+
+    try {
+        const response = await fetch("/api/applications", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                candidate_id: Number(candidate_id),
+                job_id: Number(job_id)
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Application submission failed.");
+        }
+
+        message.textContent = "Application submitted successfully! Application ID: " + data.application_id;
+        message.style.color = "green";
+        this.reset();
+
+    } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "red";
+    }
+});
+
+loadDropdowns();
+</script>
+</body>
+</html>

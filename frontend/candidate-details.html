@@ -1,0 +1,789 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Details | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .profile-card {
+            padding: 25px;
+            background: white;
+            border: 1px solid #e4eaf2;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #28375c08;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding-bottom: 22px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .profile-identity {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar-large {
+            width: 65px;
+            height: 65px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #5268e8, #9270e7);
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .profile-identity h2 {
+            margin: 0 0 6px;
+            color: #25314b;
+            font-size: 20px;
+        }
+
+        .profile-identity p {
+            color: #8993a5;
+            font-size: 11px;
+            margin: 0;
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .profile-actions button,
+        .profile-actions a {
+            padding: 10px 15px;
+            border: 0;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .edit-btn {
+            background: #eaf0ff;
+            color: #5268d6;
+        }
+
+        .delete-btn {
+            background: #fde8e7;
+            color: #b42318;
+        }
+
+        .back-btn {
+            background: #f0f2f7;
+            color: #536078;
+        }
+
+        .profile-status {
+            margin-top: 17px;
+        }
+
+        .profile-status span {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #e5f7ef;
+            color: #18865f;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .profile-section {
+            margin-top: 25px;
+        }
+
+        .profile-section h3 {
+            margin-bottom: 16px;
+            color: #5268e8;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .profile-item {
+            padding: 15px;
+            border: 1px solid #edf0f5;
+            border-radius: 10px;
+            background: #fbfcff;
+        }
+
+        .profile-item small {
+            display: block;
+            margin-bottom: 8px;
+            color: #8993a5;
+            font-size: 10px;
+        }
+
+        .profile-item strong {
+            color: #34415a;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .skills-box {
+            padding: 15px;
+            border: 1px solid #e4eaf2;
+            border-radius: 10px;
+            background: #fbfcff;
+            color: #34415a;
+            font-size: 12px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .details-message {
+            display: none;
+            margin: 15px 0;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .details-message.error {
+            display: block;
+            background: #fde8e7;
+            color: #b42318;
+        }
+
+        .details-message.success {
+            display: block;
+            background: #e5f7ef;
+            color: #167344;
+        }
+
+        .details-message.loading {
+            display: block;
+            background: #eaf0ff;
+            color: #344fba;
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 25px;
+            padding-top: 22px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .edit-form h3 {
+            color: #5268e8;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .edit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .edit-grid label {
+            display: grid;
+            gap: 8px;
+            color: #475467;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .edit-grid input,
+        .edit-grid select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #dfe5ef;
+            border-radius: 8px;
+            background: #fbfcff;
+        }
+
+        .edit-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .save-edit-btn {
+            background: linear-gradient(110deg, #5268e8, #8064df);
+        }
+
+        .cancel-edit-btn {
+            background: #f0f2f7;
+            color: #536078;
+        }
+
+        @media(max-width: 700px) {
+            .profile-grid,
+            .edit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+                padding: 16px;
+            }
+
+            .profile-header {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>
+                <b>RecruitIQ</b>
+                <small>PLACEMENT SYSTEM</small>
+            </span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav>
+            <a href="dashboard.html">
+                <span class="nav-icon">▦</span> Dashboard
+            </a>
+            <a href="candidates.html" class="active">
+                <span class="nav-icon">♟</span> Candidates
+            </a>
+            <a href="companies.html">
+                <span class="nav-icon">▣</span> Companies
+            </a>
+            <a href="jobs.html">
+                <span class="nav-icon">▤</span> Jobs
+            </a>
+            <a href="applications.html">
+                <span class="nav-icon">▧</span> Applications
+            </a>
+            <a href="interviews.html">
+                <span class="nav-icon">◷</span> Interviews
+            </a>
+            <a href="placement-process.html">
+                <span class="nav-icon">◎</span> Placement Process
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">▥</span> Reports
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-help">
+                <div class="help-icon">✦</div>
+                <b>Placement Support</b>
+                <p>Manage your recruitment activities efficiently.</p>
+            </div>
+
+            <a class="logout" href="/logout">
+              <span class="nav-icon">Logout</span>
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT / CANDIDATES / PROFILE</p>
+                <h1>Candidate Details</h1>
+                <p>View and manage candidate information.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span>
+                    <b>Admin User</b>
+                    <small>Placement Officer</small>
+                </span>
+            </div>
+        </header>
+
+        <div id="detailsMessage" class="details-message"></div>
+
+        <section class="profile-card">
+
+            <div class="profile-header">
+
+                <div class="profile-identity">
+
+                    <div class="profile-avatar-large" id="profileInitials">
+                        --
+                    </div>
+
+                    <div>
+                        <h2 id="candidateName">Loading Candidate...</h2>
+                        <p id="candidateId">Candidate ID: Loading...</p>
+
+                        <div class="profile-status">
+                            <span id="candidateStatus">Loading...</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="profile-actions">
+
+                    <button type="button" class="edit-btn" id="editButton">
+                        ✎ Edit Profile
+                    </button>
+
+                    <button type="button" class="delete-btn" id="deleteButton">
+                        Delete
+                    </button>
+
+                    <a href="candidates.html" class="back-btn">Back</a>
+
+                </div>
+
+            </div>
+
+            <!-- PERSONAL DETAILS -->
+            <div id="profileDetails">
+
+                <section class="profile-section">
+
+                    <h3>PERSONAL INFORMATION</h3>
+
+                    <div class="profile-grid">
+
+                        <div class="profile-item">
+                            <small>Full Name</small>
+                            <strong id="detailName">-</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <small>Email Address</small>
+                            <strong id="detailEmail">-</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <small>Mobile Number</small>
+                            <strong id="detailMobile">-</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <small>Qualification</small>
+                            <strong id="detailQualification">-</strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="profile-section">
+
+                    <h3>ACADEMIC INFORMATION</h3>
+
+                    <div class="profile-grid">
+
+                        <div class="profile-item">
+                            <small>Percentage</small>
+                            <strong id="detailPercentage">-</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <small>Passing Year</small>
+                            <strong id="detailYear">-</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <small>Technology</small>
+                            <strong id="detailTechnology">-</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <small>Backlogs</small>
+                            <strong id="detailBacklogs">-</strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="profile-section">
+
+                    <h3>TECHNICAL SKILLS</h3>
+
+                    <div class="skills-box" id="detailSkills">
+                        -
+                    </div>
+
+                </section>
+
+                <section class="profile-section">
+
+                    <h3>REGISTRATION INFORMATION</h3>
+
+                    <div class="profile-grid">
+
+                        <div class="profile-item">
+                            <small>Registration Date</small>
+                            <strong id="detailCreated">-</strong>
+                        </div>
+
+                        <div class="profile-item">
+                            <small>Candidate Status</small>
+                            <strong id="detailStatus">-</strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <!-- EDIT FORM -->
+            <form id="editForm" class="edit-form">
+
+                <h3>EDIT CANDIDATE INFORMATION</h3>
+
+                <div class="edit-grid">
+
+                    <label>
+                        Full Name
+                        <input type="text" id="editName" maxlength="120" required>
+                    </label>
+
+                    <label>
+                        Email
+                        <input type="email" id="editEmail" maxlength="150" required>
+                    </label>
+
+                    <label>
+                        Mobile Number
+                        <input type="tel" id="editMobile"
+                               pattern="[0-9]{10}" maxlength="10" required>
+                    </label>
+
+                    <label>
+                        Qualification
+                        <input type="text" id="editQualification">
+                    </label>
+
+                    <label>
+                        Percentage
+                        <input type="number" id="editPercentage"
+                               min="0" max="100" step="0.01">
+                    </label>
+
+                    <label>
+                        Passing Year
+                        <input type="number" id="editYear"
+                               min="1950" max="2100">
+                    </label>
+
+                    <label>
+                        Technology
+                        <input type="text" id="editTechnology">
+                    </label>
+
+                    <label>
+                        Backlogs
+                        <input type="number" id="editBacklogs" min="0" step="1">
+                    </label>
+
+                    <label style="grid-column:1/-1;">
+                        Technical Skills
+                        <input type="text" id="editSkills">
+                    </label>
+
+                    <div class="edit-actions">
+
+                        <button type="button" class="cancel-edit-btn"
+                                id="cancelEdit">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="save-edit-btn"
+                                id="saveEdit">
+                            Save Changes
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <footer class="footer">
+            &copy; 2026 RecruitIQ | Recruitment & Placement Management System
+        </footer>
+
+    </main>
+
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const candidateId = params.get("id");
+
+    const message = document.getElementById("detailsMessage");
+    const editForm = document.getElementById("editForm");
+    let candidateData = null;
+
+    function showMessage(text, type) {
+        message.textContent = text;
+        message.className = "details-message " + type;
+    }
+
+    function valueOrDash(value) {
+    return value === null || value === undefined || value === ""
+        ? "-"
+        : String(value);
+}
+
+function getInitials(name) {
+    return String(name || "NA")
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part[0].toUpperCase())
+        .join("");
+}
+
+function displayCandidate(candidate) {
+    candidateData = candidate;
+
+    document.getElementById("profileInitials").textContent =
+        getInitials(candidate.full_name);
+
+    document.getElementById("candidateName").textContent =
+        valueOrDash(candidate.full_name);
+
+    document.getElementById("candidateId").textContent =
+        "Candidate ID: CAN" + String(candidate.candidate_id).padStart(3, "0");
+
+    document.getElementById("candidateStatus").textContent =
+        valueOrDash(candidate.candidate_status);
+
+    document.getElementById("detailName").textContent =
+        valueOrDash(candidate.full_name);
+
+    document.getElementById("detailEmail").textContent =
+        valueOrDash(candidate.email);
+
+    document.getElementById("detailMobile").textContent =
+        valueOrDash(candidate.mobile);
+
+    document.getElementById("detailQualification").textContent =
+        valueOrDash(candidate.qualification);
+
+    document.getElementById("detailPercentage").textContent =
+        candidate.percentage === null || candidate.percentage === undefined
+            ? "-"
+            : Number(candidate.percentage).toFixed(2) + "%";
+
+    document.getElementById("detailYear").textContent =
+        valueOrDash(candidate.passing_year);
+
+    document.getElementById("detailTechnology").textContent =
+        valueOrDash(candidate.technology);
+
+    document.getElementById("detailBacklogs").textContent =
+        valueOrDash(candidate.backlogs);
+
+    document.getElementById("detailSkills").textContent =
+        valueOrDash(candidate.skills);
+
+    document.getElementById("detailCreated").textContent =
+        candidate.created_at
+            ? new Date(candidate.created_at).toLocaleDateString("en-IN")
+            : "-";
+
+    document.getElementById("detailStatus").textContent =
+        valueOrDash(candidate.candidate_status);
+}
+    async function loadCandidate() {
+        if (!candidateId || !/^[1-9]\d*$/.test(candidateId)) {
+            showMessage("Candidate ID is missing or invalid. Open this page from the Candidates list.", "error");
+            document.getElementById("candidateName").textContent = "Candidate not selected";
+            return;
+        }
+
+        showMessage("Loading candidate details from MySQL...", "loading");
+
+        try {
+            const response = await fetch(
+                "/api/candidates/" + encodeURIComponent(candidateId)
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Candidate not found.");
+            }
+
+            displayCandidate(result.candidate);
+
+            message.textContent = "";
+            message.className = "details-message";
+
+        } catch (error) {
+            showMessage(error.message, "error");
+            document.getElementById("candidateName").textContent =
+                "Unable to load candidate";
+        }
+    }
+
+    document.getElementById("editButton").addEventListener("click", function() {
+        if (!candidateData) return;
+
+        document.getElementById("editName").value =
+            candidateData.full_name || "";
+
+        document.getElementById("editEmail").value =
+            candidateData.email || "";
+
+        document.getElementById("editMobile").value =
+            candidateData.mobile || "";
+
+        document.getElementById("editQualification").value =
+            candidateData.qualification || "";
+
+        document.getElementById("editPercentage").value =
+            candidateData.percentage ?? "";
+
+        document.getElementById("editYear").value =
+            candidateData.passing_year ?? "";
+
+        document.getElementById("editTechnology").value =
+            candidateData.technology || "";
+
+        document.getElementById("editBacklogs").value =
+            candidateData.backlogs ?? 0;
+
+        document.getElementById("editSkills").value =
+            candidateData.skills || "";
+
+        editForm.style.display = "block";
+        editForm.scrollIntoView({ behavior: "smooth" });
+    });
+
+    document.getElementById("cancelEdit").addEventListener("click", function() {
+        editForm.style.display = "none";
+    });
+
+    editForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        if (!editForm.reportValidity()) return;
+
+        const payload = {
+            full_name: document.getElementById("editName").value.trim(),
+            email: document.getElementById("editEmail").value.trim(),
+            mobile: document.getElementById("editMobile").value.trim(),
+            qualification: document.getElementById("editQualification").value.trim(),
+            percentage: document.getElementById("editPercentage").value === ""
+                ? null : Number(document.getElementById("editPercentage").value),
+            passing_year: document.getElementById("editYear").value === ""
+                ? null : Number(document.getElementById("editYear").value),
+            technology: document.getElementById("editTechnology").value.trim(),
+            skills: document.getElementById("editSkills").value.trim(),
+            backlogs: Number(document.getElementById("editBacklogs").value)
+        };
+
+        const button = document.getElementById("saveEdit");
+        button.disabled = true;
+        button.textContent = "Saving...";
+
+        try {
+            const response = await fetch(
+                "/api/candidates/" + encodeURIComponent(candidateId),
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to update candidate.");
+            }
+
+            editForm.style.display = "none";
+            await loadCandidate();
+            showMessage("Candidate updated successfully!", "success");
+
+        } catch (error) {
+            showMessage(error.message, "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = "Save Changes";
+        }
+    });
+
+    document.getElementById("deleteButton").addEventListener("click", async function() {
+        if (!candidateData) return;
+
+        const confirmed = confirm(
+            "Are you sure you want to delete " +
+            candidateData.full_name + "?"
+        );
+
+        if (!confirmed) return;
+
+        const button = document.getElementById("deleteButton");
+        button.disabled = true;
+
+        try {
+            const response = await fetch(
+                "/api/candidates/" + encodeURIComponent(candidateId),
+                { method: "DELETE" }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to delete candidate.");
+            }
+
+            alert("Candidate deleted successfully!");
+
+            window.location.href = "candidates.html";
+
+        } catch (error) {
+            showMessage(error.message, "error");
+            button.disabled = false;
+        }
+    });
+
+    loadCandidate();
+</script>
+
+</body>
+</html>
+

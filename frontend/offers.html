@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offers | Placement Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span><b>Placement</b><small>MANAGEMENT</small></span>
+        </a>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="candidates.html">Candidates</a>
+            <a href="companies.html">Companies</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="applications.html">Applications</a>
+            <a href="interviews.html">Interviews</a>
+            <a href="offers.html" class="active">Offers</a>
+            <a href="placements.html">Placements</a>
+            <a href="placement-process.html">Placement Process</a>
+            <a href="reports.html">Reports</a>
+        </nav>
+
+        <a class="logout" href="/logout">Logout</a>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+                <h1>Offers Management</h1>
+                <p>Manage candidate job offers and joining details.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span><b>Admin User</b><small>Placement Officer</small></span>
+            </div>
+        </header>
+
+        <section class="panel">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Offer Records</h2>
+                    <p>View all candidate offers.</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="loadOffers()">
+                    Refresh
+                </button>
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <p>Total Offers</p>
+                    <h2 id="totalOffers">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Accepted</p>
+                    <h2 id="acceptedOffers">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Pending</p>
+                    <h2 id="pendingOffers">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Declined</p>
+                    <h2 id="declinedOffers">0</h2>
+                </div>
+
+            </div>
+
+            <p id="message"></p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Offer ID</th>
+                            <th>Application ID</th>
+                            <th>Offer Date</th>
+                            <th>Package (LPA)</th>
+                            <th>Offer Status</th>
+                            <th>Joining Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="offerTable">
+                        <tr>
+                            <td colspan="6">Loading offers...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            Recruitment & Placement Management System
+        </footer>
+
+    </main>
+</div>
+
+<script>
+
+async function loadOffers() {
+
+    const table = document.getElementById("offerTable");
+    const message = document.getElementById("message");
+
+    table.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
+
+    try {
+
+        const response = await fetch("/api/offers");
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to load offers");
+        }
+
+        const offers = result.offers || [];
+
+        document.getElementById("totalOffers").textContent = offers.length;
+
+        document.getElementById("acceptedOffers").textContent =
+            offers.filter(o => o.offer_status === "Accepted").length;
+
+        document.getElementById("pendingOffers").textContent =
+            offers.filter(o => o.offer_status === "Pending").length;
+
+        document.getElementById("declinedOffers").textContent =
+            offers.filter(o => o.offer_status === "Declined").length;
+
+        if (offers.length === 0) {
+
+            table.innerHTML =
+                "<tr><td colspan='6'>No offer records found.</td></tr>";
+
+            message.textContent = "No offers available yet.";
+            return;
+        }
+
+        message.textContent = "";
+
+        table.innerHTML = offers.map(o => `
+            <tr>
+                <td>${o.offer_id ?? o.id ?? "-"}</td>
+                <td>${o.application_id ?? "-"}</td>
+                <td>${o.offer_date ?? "-"}</td>
+                <td>${o.package ?? "-"}</td>
+                <td>${o.offer_status ?? "-"}</td>
+                <td>${o.joining_date ?? "-"}</td>
+            </tr>
+        `).join("");
+
+    } catch (error) {
+
+        table.innerHTML =
+            "<tr><td colspan='6'>Unable to load offer records.</td></tr>";
+
+        message.textContent = error.message;
+    }
+}
+
+loadOffers();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Company | RecruitIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .company-form-card {
+            padding: 28px;
+            background: white;
+            border: 1px solid #e4eaf2;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #28375c08;
+        }
+
+        .company-form-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 22px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .company-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #e9efff;
+            color: #5268e8;
+            font-size: 23px;
+        }
+
+        .company-form-heading h2 {
+            margin: 0;
+            color: #25314b;
+            font-size: 17px;
+        }
+
+        .company-form-heading p {
+            margin: 5px 0 0;
+            color: #8993a5;
+            font-size: 11px;
+        }
+
+        .company-fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .company-fields label {
+            display: grid;
+            gap: 8px;
+            color: #475467;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .company-fields input {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #dfe5ef;
+            border-radius: 8px;
+            background: #fbfcff;
+            font-size: 12px;
+        }
+
+        .company-section-title {
+            grid-column: 1 / -1;
+            color: #5268e8;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .company-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-top: 20px;
+            margin-top: 10px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .company-message {
+            display: none;
+            padding: 13px;
+            margin-top: 17px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .company-message.success {
+            display: block;
+            background: #e5f7ef;
+            color: #167344;
+        }
+
+        .company-message.error {
+            display: block;
+            background: #fde8e7;
+            color: #b42318;
+        }
+
+        .company-save {
+            background: linear-gradient(110deg, #5268e8, #8064df);
+        }
+
+        @media(max-width: 700px) {
+            .company-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .company-section-title,
+            .company-actions {
+                grid-column: 1;
+            }
+
+            .company-form-card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">RI</span>
+            <span>
+                <b>RecruitIQ</b>
+                <small>PLACEMENT SYSTEM</small>
+            </span>
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav>
+            <a href="dashboard.html"><span class="nav-icon">▦</span> Dashboard</a>
+            <a href="candidates.html"><span class="nav-icon">♟</span> Candidates</a>
+            <a href="companies.html" class="active"><span class="nav-icon">▣</span> Companies</a>
+            <a href="jobs.html"><span class="nav-icon">▤</span> Jobs</a>
+            <a href="applications.html"><span class="nav-icon">▧</span> Applications</a>
+            <a href="interviews.html"><span class="nav-icon">◷</span> Interviews</a>
+            <a href="placement-process.html"><span class="nav-icon">◎</span> Placement Process</a>
+            <a href="reports.html"><span class="nav-icon">▥</span> Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-help">
+                <div class="help-icon">✦</div>
+                <b>Placement Support</b>
+                <p>Manage your recruitment activities efficiently.</p>
+            </div>
+
+            <a class="logout" href="/logout">
+                <span class="nav-icon">â†ª</span> Logout
+            </a>
+        </div>
+
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">RECRUITMENT / COMPANIES</p>
+                <h1>Add New Company</h1>
+                <p>Register a recruiting company.</p>
+            </div>
+
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span>
+                    <b>Admin User</b>
+                    <small>Placement Officer</small>
+                </span>
+            </div>
+        </header>
+
+        <section class="company-form-card">
+
+            <div class="company-form-heading">
+                <div class="company-icon">▣</div>
+                <div>
+                    <h2>Company Registration</h2>
+                    <p>Enter company and contact information.</p>
+                </div>
+            </div>
+
+            <form id="companyForm">
+
+                <div class="company-fields">
+
+                    <div class="company-section-title">
+                        COMPANY INFORMATION
+                    </div>
+
+                    <label>
+                        Company Name *
+                        <input type="text" id="company_name"
+                               placeholder="Enter company name"
+                               maxlength="150" required>
+                    </label>
+
+                    <label>
+                        Contact Person
+                        <input type="text" id="contact_person"
+                               placeholder="Enter contact person">
+                    </label>
+
+                    <label>
+                        Company Email
+                        <input type="email" id="email"
+                               placeholder="hr@company.com">
+                    </label>
+
+                    <label>
+                        Mobile Number
+                        <input type="tel" id="mobile"
+                               placeholder="10-digit mobile number"
+                               pattern="[0-9]{10}" maxlength="10">
+                    </label>
+
+                    <label>
+                        Company Location
+                        <input type="text" id="location"
+                               placeholder="e.g. Pune, Mumbai">
+                    </label>
+
+                </div>
+
+                <div id="companyMessage"
+                     class="company-message"
+                     role="status"
+                     aria-live="polite"></div>
+
+                <div class="company-actions">
+
+                    <a href="companies.html" class="button secondary">
+                        Cancel
+                    </a>
+
+                    <button type="reset" class="button secondary">
+                        Reset
+                    </button>
+
+                    <button type="submit" class="company-save">
+                        ✓ Save Company
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <footer class="footer">
+            Â© 2026 RecruitIQ Â· Recruitment & Placement Management System
+        </footer>
+
+    </main>
+
+</div>
+
+<script>
+    const form = document.getElementById("companyForm");
+    const message = document.getElementById("companyMessage");
+
+    function showMessage(text, type) {
+        message.textContent = text;
+        message.className = "company-message " + type;
+    }
+
+    form.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        if (!form.reportValidity()) return;
+
+        const payload = {
+            company_name: document.getElementById("company_name").value.trim(),
+            contact_person: document.getElementById("contact_person").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            mobile: document.getElementById("mobile").value.trim(),
+            location: document.getElementById("location").value.trim()
+        };
+
+        const button = form.querySelector('button[type="submit"]');
+
+        button.disabled = true;
+        button.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch("/api/companies", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to save company.");
+            }
+
+            form.reset();
+
+            showMessage(
+                result.message + " Company ID: " + result.company_id,
+                "success"
+            );
+
+        } catch (error) {
+
+            showMessage(error.message, "error");
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "✓ Save Company";
+
+        }
+
+    });
+
+    form.addEventListener("reset", function() {
+        message.textContent = "";
+        message.className = "company-message";
+    });
+</script>
+
+</body>
+</html>
+
+
