@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -530,10 +530,15 @@
                 <td>${escapeHTML(percentage)}</td>
                 <td>${escapeHTML(candidate.technology || "â€”")}</td>
                 <td>
-                    <span class="candidate-status ${statusClass}">
-                        ${escapeHTML(candidate.candidate_status || "Active")}
-                    </span>
-                </td>
+    <select
+        class="candidate-status ${statusClass}"
+        data-candidate-id="${candidate.candidate_id}"
+    >
+        <option value="Active" ${candidate.candidate_status === "Active" ? "selected" : ""}>Active</option>
+        <option value="Inactive" ${candidate.candidate_status === "Inactive" ? "selected" : ""}>Inactive</option>
+        <option value="Placed" ${candidate.candidate_status === "Placed" ? "selected" : ""}>Placed</option>
+    </select>
+</td>
                 <td>
                     <a
                         href="candidate-details.html?id=${encodeURIComponent(candidate.candidate_id)}"
@@ -578,6 +583,56 @@
         displayCandidates(filtered);
     }
 
+    async function changeCandidateStatus(candidateId, newStatus, selectElement) {
+    const oldStatus = allCandidates.find(
+        c => String(c.candidate_id) === String(candidateId)
+    )?.candidate_status || "Active";
+
+    selectElement.disabled = true;
+
+    try {
+        const response = await fetch(
+            `/api/candidates/${candidateId}/status`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    candidate_status: newStatus
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Status update failed.");
+        }
+
+        const candidate = allCandidates.find(
+            c => String(c.candidate_id) === String(candidateId)
+        );
+
+        if (candidate) {
+            candidate.candidate_status = newStatus;
+        }
+
+        updateStatistics(allCandidates);
+        filterCandidates();
+
+        messageBox.className = "candidate-message";
+        messageBox.textContent = "Candidate status updated successfully!";
+
+    } catch (error) {
+        selectElement.value = oldStatus;
+        alert(error.message);
+
+    } finally {
+        selectElement.disabled = false;
+    }
+    }
+
     async function loadCandidates() {
         messageBox.className = "candidate-message loading";
         messageBox.textContent = "Loading candidates from MySQL...";
@@ -606,6 +661,15 @@
             candidateCount.textContent = "Error";
         }
     }
+    candidateRows.addEventListener("change", function(event) {
+    if (event.target.matches(".candidate-status")) {
+        changeCandidateStatus(
+            event.target.dataset.candidateId,
+            event.target.value,
+            event.target
+        );
+    }
+});
 
     searchInput.addEventListener("input", filterCandidates);
     statusFilter.addEventListener("change", filterCandidates);

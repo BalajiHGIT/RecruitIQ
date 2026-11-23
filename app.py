@@ -5,6 +5,7 @@ import re
 import os
 from dotenv import load_dotenv
 
+
 load_dotenv()
 from datetime import date, datetime
 from decimal import Decimal
@@ -28,6 +29,7 @@ from models.application import Application
 from models.interview import Interview
 from models.offer import Offer
 from models.placement import Placement
+
 
 from services.company_service import (
     add_company,
@@ -546,6 +548,63 @@ def update_candidate(candidate_id):
             cursor.close()
         if connection:
             connection.close()
+            # ---------------- UPDATE CANDIDATE STATUS ----------------
+
+@app.route("/api/candidates/<int:candidate_id>/status", methods=["PATCH"])
+def update_candidate_status(candidate_id):
+    data = request.get_json(silent=True) or {}
+    status = data.get("candidate_status")
+
+    if status not in ["Active", "Inactive", "Placed"]:
+        return jsonify({
+            "success": False,
+            "message": "Invalid candidate status."
+        }), 400
+
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            UPDATE candidates
+            SET candidate_status = %s
+            WHERE candidate_id = %s
+        """, (status, candidate_id))
+
+        if cursor.rowcount == 0:
+            cursor.execute(
+                "SELECT candidate_id FROM candidates WHERE candidate_id = %s",
+                (candidate_id,)
+            )
+            if not cursor.fetchone():
+                return jsonify({
+                    "success": False,
+                    "message": "Candidate not found."
+                }), 404
+
+        connection.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Status updated successfully."
+        }), 200
+
+    except Error:
+        if connection:
+            connection.rollback()
+        return jsonify({
+            "success": False,
+            "message": "Database error."
+        }), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 
 # ---------------- DELETE CANDIDATE ----------------
@@ -1051,25 +1110,20 @@ def api_get_applications():
             "success": False,
             "message": "Database error while fetching applications."
         }), 500
-
-
+    
+# CANDIDATE APPLY FOR JOB
 @app.route("/api/applications", methods=["POST"])
 def api_add_application():
+    data = request.get_json(silent=True) or {}
+
     try:
-        data = request.get_json(silent=True) or {}
-
-        candidate_id = int(data.get("candidate_id", 0))
-        job_id = int(data.get("job_id", 0))
-
-        if candidate_id <= 0 or job_id <= 0:
-            return jsonify({
-                "success": False,
-                "message": "Valid candidate ID and job ID are required."
-            }), 400
+        candidate_id = int(data.get("candidate_id"))
+        job_id = int(data.get("job_id"))
 
         application = Application(
             candidate_id=candidate_id,
             job_id=job_id,
+           
             application_status="Applied"
         )
 
@@ -1077,11 +1131,11 @@ def api_add_application():
 
         return jsonify({
             "success": True,
-            "message": "Application submitted successfully.",
+            "message": "Job application submitted successfully!",
             "application_id": application_id
         }), 201
 
-    except (ValueError, TypeError) as exc:
+    except (TypeError, ValueError) as exc:
         return jsonify({
             "success": False,
             "message": str(exc)
@@ -1092,6 +1146,63 @@ def api_add_application():
             "success": False,
             "message": "Database error while submitting application."
         }), 500
+
+    
+# GET CANDIDATE APPLICATIONS
+@app.route("/api/candidate-applications/<int:candidate_id>", methods=["GET"])
+def api_get_candidate_applications(candidate_id):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT
+                a.application_id,
+                a.candidate_id,
+                a.job_id,
+                j.job_title,
+                co.company_name,
+                a.application_date,
+                a.application_status
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.job_id
+            JOIN companies co ON j.company_id = co.company_id
+            WHERE a.candidate_id = %s
+            ORDER BY a.application_id DESC
+            """,
+            (candidate_id,)
+        )
+
+        applications = cursor.fetchall()
+
+        return jsonify({
+            "success": True,
+            "count": len(applications),
+            "applications": [
+                serialize_candidate(application)
+                for application in applications
+            ]
+        })
+
+    except Error:
+        return jsonify({
+            "success": False,
+            "message": "Unable to load candidate applications."
+        }), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+
+
+    
 
 
 @app.route("/api/applications/<int:application_id>", methods=["PUT"])
@@ -1774,10 +1885,10 @@ def get_resume_screenings():
 
 
 # ---------------- START SERVER ----------------
-
 if __name__ == "__main__":
     app.run(
         host="127.0.0.1",
         port=5000,
-        debug=True
+        debug=False,
+        use_reloader=False
     )

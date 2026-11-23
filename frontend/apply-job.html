@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candidate Portal | RecruitIQ</title>
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+.candidate-content {
+    max-width: 2900px;
+    margin: 50px auto;
+}
+
+.portal-card {
+    background: #fff;
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+}
+
+.portal-card h2 {
+    color: #243f68;
+    margin: 0 0 22px;
+}
+
+.portal-form label {
+    display: blue;
+    font-weight: 600;
+    margin: 17px 0 8px;
+}
+
+.portal-form input,
+.portal-form select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.portal-btn {
+    width: 100%;
+    padding: 14px;
+    background: #243f68;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    margin-top: 22px;
+    font-size: 15px;
+}
+
+.portal-btn:hover {
+    background: #193253;
+}
+
+.portal-message {
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+.application-list {
+    display: grid;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.application-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+    padding: 17px;
+    background: #fafbfc;
+    line-height: 1.9;
+}
+
+.application-item strong {
+    color: #243f68;
+}
+
+@media(max-width:700px) {
+    .candidate-content {
+        margin: 15px 0;
+    }
+
+    .portal-card {
+        padding: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app-shell">
+
+<aside class="sidebar">
+
+<a class="brand" href="dashboard.html">
+    <span class="brand-mark">RI</span>
+    <span><b>Placement</b><small>MANAGEMENT</small></span>
+</a>
+
+<nav>
+    <a href="dashboard.html">
+        <span class="nav-icon">▦</span> Dashboard
+    </a>
+
+    <a href="candidates.html">
+        <span class="nav-icon">♟</span> Candidates
+    </a>
+
+    <a href="companies.html">
+        <span class="nav-icon">▣</span> Companies
+    </a>
+
+    <a href="jobs.html">
+        <span class="nav-icon">▤</span> Jobs
+    </a>
+
+    <a href="applications.html">
+        <span class="nav-icon">▧</span> Applications
+    </a>
+
+    <a href="interviews.html">
+        <span class="nav-icon">◷</span> Interviews
+    </a>
+
+    <a href="offers.html">
+        <span class="nav-icon">📄</span> Offers
+    </a>
+
+    <a href="placements.html">
+        <span class="nav-icon">🎓</span> Placements
+    </a>
+
+    <a href="placement-process.html">
+        <span class="nav-icon">◎</span> Placement Process
+    </a>
+
+    <a href="resume-screening.html">
+        <span class="nav-icon">🤖</span> AI Resume Screening
+    </a>
+
+    <a href="apply-job.html" class="active">
+        <span class="nav-icon">📝</span> Candidate Portal
+    </a>
+</nav>
+
+<a class="logout" href="/logout">Logout</a>
+
+</aside>
+
+<main class="main-content">
+
+<header class="topbar">
+    <div>
+        <p class="eyebrow">RECRUITMENT & PLACEMENT</p>
+        <h1>Candidate Portal</h1>
+        <p>Apply for available jobs and track your applications.</p>
+    </div>
+
+    <div class="user-chip">
+        <span class="avatar">C</span>
+        <span><b>Candidate</b><small>Job Applicant</small></span>
+    </div>
+</header>
+
+<div class="candidate-content">
+
+    <section class="portal-card">
+        <h2>Apply for Job</h2>
+
+        <div class="portal-form">
+
+            <label for="candidateId">Candidate ID</label>
+            <input
+                type="number"
+                id="candidateId"
+                placeholder="Enter Candidate ID"
+                min="1"
+            >
+
+            <label for="jobSelect">Select Job</label>
+            <select id="jobSelect">
+                <option value="">Select a Job</option>
+            </select>
+
+            <button class="portal-btn" onclick="applyJob()">
+                Apply Now
+            </button>
+
+            <p id="applyMessage" class="portal-message"></p>
+
+        </div>
+    </section>
+
+    <section class="portal-card">
+        <h2>My Applications</h2>
+
+        <button class="portal-btn" onclick="loadApplications()">
+            View My Applications
+        </button>
+
+        <p id="applicationsMessage" class="portal-message"></p>
+
+        <div id="applicationsList" class="application-list"></div>
+    </section>
+
+</div>
+
+<footer class="footer">
+    RecruitIQ · Recruitment & Placement Management System
+</footer>
+
+</main>
+</div>
+
+<script>
+async function loadJobs() {
+    const jobSelect = document.getElementById("jobSelect");
+
+    try {
+        const response = await fetch("/api/jobs");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to load jobs.");
+        }
+
+        jobSelect.innerHTML = '<option value="">Select a Job</option>';
+
+        const jobs = (data.jobs || []).filter(job =>
+            String(job.job_status).toLowerCase() === "open"
+        );
+
+        jobs.forEach(job => {
+            const option = document.createElement("option");
+            option.value = job.job_id;
+            option.textContent = job.job_title;
+            jobSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        jobSelect.innerHTML = '<option value="">Unable to load jobs</option>';
+        document.getElementById("applyMessage").textContent = error.message;
+    }
+}
+
+async function applyJob() {
+    const candidateId = document.getElementById("candidateId").value.trim();
+    const jobId = document.getElementById("jobSelect").value;
+    const message = document.getElementById("applyMessage");
+
+    message.textContent = "";
+
+    if (!candidateId || Number(candidateId) <= 0) {
+        message.textContent = "Please enter a valid Candidate ID.";
+        return;
+    }
+
+    if (!jobId) {
+        message.textContent = "Please select a job.";
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/applications", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                candidate_id: Number(candidateId),
+                job_id: Number(jobId)
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Application submission failed.");
+        }
+
+        message.textContent = "Job application submitted successfully!";
+        message.style.color = "green";
+
+        loadApplications();
+
+    } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "#b42318";
+    }
+}
+
+async function loadApplications() {
+    const candidateId = document.getElementById("candidateId").value.trim();
+    const message = document.getElementById("applicationsMessage");
+    const list = document.getElementById("applicationsList");
+
+    if (!candidateId || Number(candidateId) <= 0) {
+        message.textContent = "Please enter your Candidate ID first.";
+        list.innerHTML = "";
+        return;
+    }
+
+    message.textContent = "Loading applications...";
+    list.innerHTML = "";
+
+    try {
+        const response = await fetch(
+            `/api/candidate-applications/${encodeURIComponent(candidateId)}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to load applications.");
+        }
+
+        const applications = data.applications || [];
+
+        message.textContent = "Total Applications: " + applications.length;
+
+        if (applications.length === 0) {
+            list.innerHTML = "<p>No applications found.</p>";
+            return;
+        }
+
+        list.innerHTML = applications.map(app => `
+            <div class="application-item">
+                <div><strong>Application ID:</strong> ${escapeHTML(app.application_id)}</div>
+                <div><strong>Job Title:</strong> ${escapeHTML(app.job_title)}</div>
+                <div><strong>Company:</strong> ${escapeHTML(app.company_name)}</div>
+                <div><strong>Application Date:</strong> ${escapeHTML(app.application_date)}</div>
+                <div><strong>Status:</strong> ${escapeHTML(app.application_status)}</div>
+            </div>
+        `).join("");
+
+    } catch (error) {
+        message.textContent = error.message;
+        list.innerHTML = "";
+    }
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+loadJobs();
+</script>
+
+</body>
+</html>
