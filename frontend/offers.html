@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offers | Placement Manager</title>
+    <title>Offers | RecruitIQ</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -48,6 +48,77 @@
             </div>
         </header>
 
+        <!-- Add Offer Form -->
+        <section class="panel">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Add New Offer</h2>
+                    <p>Create a job offer for an application.</p>
+                </div>
+            </div>
+
+            <form id="offerForm">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="application_id">Application ID</label>
+                        <input
+                            type="number"
+                            id="application_id"
+                            name="application_id"
+                            placeholder="Enter Application ID"
+                            min="1"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="package">Package (LPA)</label>
+                        <input
+                            type="number"
+                            id="package"
+                            name="package"
+                            placeholder="Enter Package"
+                            min="0.01"
+                            step="0.01"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="offer_status">Offer Status</label>
+                        <select id="offer_status" name="offer_status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Declined">Declined</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="joining_date">Joining Date</label>
+                        <input
+                            type="date"
+                            id="joining_date"
+                            name="joining_date"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="saveOfferBtn">
+                    Save Offer
+                </button>
+
+            </form>
+
+            <p id="formMessage"></p>
+
+        </section>
+
+        <!-- Offer Records -->
         <section class="panel">
 
             <div class="section-heading">
@@ -119,6 +190,67 @@
 
 <script>
 
+// Add New Offer
+document.getElementById("offerForm").addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const formMessage = document.getElementById("formMessage");
+    const saveButton = document.getElementById("saveOfferBtn");
+
+    const offerData = {
+        application_id: Number(document.getElementById("application_id").value),
+        package: Number(document.getElementById("package").value),
+        offer_status: document.getElementById("offer_status").value,
+        joining_date: document.getElementById("joining_date").value
+    };
+
+    if (!offerData.application_id || offerData.package <= 0 || !offerData.joining_date) {
+        formMessage.textContent = "Please enter valid offer details.";
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving...";
+    formMessage.textContent = "";
+
+    try {
+
+        const response = await fetch("/api/offers", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(offerData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to save offer.");
+        }
+
+        formMessage.textContent = result.message || "Offer added successfully!";
+
+        document.getElementById("offerForm").reset();
+
+        await loadOffers();
+
+    } catch (error) {
+
+        formMessage.textContent = error.message;
+
+    } finally {
+
+        saveButton.disabled = false;
+        saveButton.textContent = "Save Offer";
+
+    }
+
+});
+
+
+// Load Offers
 async function loadOffers() {
 
     const table = document.getElementById("offerTable");
@@ -132,7 +264,7 @@ async function loadOffers() {
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-            throw new Error(result.message || "Unable to load offers");
+            throw new Error(result.message || "Unable to load offers.");
         }
 
         const offers = result.offers || [];
@@ -146,7 +278,10 @@ async function loadOffers() {
             offers.filter(o => o.offer_status === "Pending").length;
 
         document.getElementById("declinedOffers").textContent =
-            offers.filter(o => o.offer_status === "Declined").length;
+            offers.filter(o =>
+                o.offer_status === "Declined" ||
+                o.offer_status === "Rejected"
+            ).length;
 
         if (offers.length === 0) {
 
@@ -176,9 +311,12 @@ async function loadOffers() {
             "<tr><td colspan='6'>Unable to load offer records.</td></tr>";
 
         message.textContent = error.message;
+
     }
+
 }
 
+// Initial Load
 loadOffers();
 
 </script>

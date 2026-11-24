@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Placements | Placement Manager</title>
+    <title>Placements | RecruitIQ</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -46,30 +46,109 @@
             </div>
         </header>
 
+        <!-- ADD PLACEMENT FORM -->
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Add Placement</h2>
+                    <p>Record a selected candidate's final placement details.</p>
+                </div>
+            </div>
+
+            <form id="placementForm">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="candidate_id">Candidate ID</label>
+                        <input type="number" id="candidate_id"
+                               value="6" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company_id">Company ID</label>
+                        <input type="number" id="company_id"
+                               value="7" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job_id">Job ID</label>
+                        <input type="number" id="job_id"
+                               value="5" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="joining_date">Joining Date</label>
+                        <input type="date" id="joining_date"
+                               value="2026-12-10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="package">Package (LPA)</label>
+                        <input type="number" id="package"
+                               value="4" min="0.01" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="placement_status">Placement Status</label>
+                        <select id="placement_status" required>
+                            <option value="Confirmed" selected>Confirmed</option>
+                            <option value="Joined">Joined</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" id="saveButton">
+                        Save Placement
+                    </button>
+                </div>
+
+            </form>
+
+            <p id="formMessage" role="status"></p>
+        </section>
+
+        <!-- PLACEMENT RECORDS -->
         <section class="panel">
             <div class="section-heading">
                 <div>
                     <h2>Placement Records</h2>
                     <p>Final selected and placed candidates.</p>
                 </div>
+
                 <button class="btn btn-primary" onclick="loadPlacements()">
                     Refresh
                 </button>
             </div>
 
+            <!-- STATISTICS -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <p>Total Placements</p>
                     <h2 id="totalCount">0</h2>
                 </div>
+
                 <div class="stat-card">
                     <p>Joined</p>
                     <h2 id="joinedCount">0</h2>
                 </div>
+
                 <div class="stat-card">
                     <p>Confirmed</p>
                     <h2 id="confirmedCount">0</h2>
                 </div>
+            </div>
+
+            <!-- STATUS FILTER -->
+            <div class="form-group" style="max-width: 300px; margin: 20px 0;">
+                <label for="statusFilter">Filter by Placement Status</label>
+                <select id="statusFilter" onchange="filterPlacements()">
+                    <option value="All">All Placements</option>
+                    <option value="Joined">Joined Only</option>
+                    <option value="Confirmed">Confirmed Only</option>
+                    <option value="Cancelled">Cancelled Only</option>
+                </select>
             </div>
 
             <p id="message"></p>
@@ -79,14 +158,15 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Candidate ID</th>
-                            <th>Company ID</th>
-                            <th>Job ID</th>
+                            <th>Candidate Name</th>
+                            <th>Company Name</th>
+                            <th>Job Title</th>
                             <th>Joining Date</th>
                             <th>Package</th>
                             <th>Status</th>
                         </tr>
                     </thead>
+
                     <tbody id="placementTable">
                         <tr>
                             <td colspan="7">Loading placements...</td>
@@ -104,13 +184,137 @@
 </div>
 
 <script>
+
+// Store all placement records
+let allPlacements = [];
+
+
+// ADD PLACEMENT
+document.getElementById("placementForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const button = document.getElementById("saveButton");
+    const formMessage = document.getElementById("formMessage");
+
+    const data = {
+        candidate_id: Number(document.getElementById("candidate_id").value),
+        company_id: Number(document.getElementById("company_id").value),
+        job_id: Number(document.getElementById("job_id").value),
+        joining_date: document.getElementById("joining_date").value || null,
+        package: Number(document.getElementById("package").value),
+        placement_status: document.getElementById("placement_status").value
+    };
+
+    if (
+        !data.candidate_id ||
+        !data.company_id ||
+        !data.job_id ||
+        !data.package ||
+        data.package <= 0
+    ) {
+        formMessage.textContent = "Please enter valid placement details.";
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Saving...";
+    formMessage.textContent = "";
+
+    try {
+
+        const response = await fetch("/api/placements", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to add placement.");
+        }
+
+        formMessage.textContent =
+            "Placement added successfully! Placement ID: " + result.placement_id;
+
+        await loadPlacements();
+
+    } catch (error) {
+
+        formMessage.textContent = error.message;
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Save Placement";
+
+    }
+
+});
+
+
+// FILTER PLACEMENTS
+function filterPlacements() {
+
+    const selectedStatus = document.getElementById("statusFilter").value;
+
+    let filteredPlacements = allPlacements;
+
+    if (selectedStatus !== "All") {
+        filteredPlacements = allPlacements.filter(
+            p => p.placement_status === selectedStatus
+        );
+    }
+
+    displayPlacements(filteredPlacements);
+}
+
+
+// DISPLAY PLACEMENTS
+function displayPlacements(placements) {
+
+    const table = document.getElementById("placementTable");
+    const message = document.getElementById("message");
+
+    if (placements.length === 0) {
+
+        table.innerHTML =
+            "<tr><td colspan='7'>No placement records found for this status.</td></tr>";
+
+        message.textContent = "No matching placement records available.";
+        return;
+    }
+
+    message.textContent = "";
+
+    table.innerHTML = placements.map(p => `
+        <tr>
+            <td>${p.placement_id ?? p.id ?? "-"}</td>
+            <td>${p.full_name ?? "-"}</td>
+            <td>${p.company_name ?? "-"}</td>
+            <td>${p.job_title ?? "-"}</td>
+            <td>${p.joining_date ?? "-"}</td>
+            <td>${p.package ?? "-"}</td>
+            <td>${p.placement_status ?? "-"}</td>
+        </tr>
+    `).join("");
+
+}
+
+
+// LOAD PLACEMENTS
 async function loadPlacements() {
+
     const table = document.getElementById("placementTable");
     const message = document.getElementById("message");
 
     table.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
 
     try {
+
         const response = await fetch("/api/placements");
         const result = await response.json();
 
@@ -118,43 +322,35 @@ async function loadPlacements() {
             throw new Error(result.message || "Unable to load placements");
         }
 
-        const placements = result.placements || [];
+        allPlacements = result.placements || [];
 
-        document.getElementById("totalCount").textContent = placements.length;
+        // Update statistics using all records
+        document.getElementById("totalCount").textContent =
+            allPlacements.length;
+
         document.getElementById("joinedCount").textContent =
-            placements.filter(p => p.placement_status === "Joined").length;
+            allPlacements.filter(p => p.placement_status === "Joined").length;
+
         document.getElementById("confirmedCount").textContent =
-            placements.filter(p => p.placement_status === "Confirmed").length;
+            allPlacements.filter(p => p.placement_status === "Confirmed").length;
 
-        if (placements.length === 0) {
-            table.innerHTML =
-                "<tr><td colspan='7'>No placement records found.</td></tr>";
-            message.textContent = "No placement records available yet.";
-            return;
-        }
-
-        message.textContent = "";
-
-        table.innerHTML = placements.map(p => `
-            <tr>
-                <td>${p.placement_id ?? p.id ?? "-"}</td>
-                <td>${p.candidate_id ?? "-"}</td>
-                <td>${p.company_id ?? "-"}</td>
-                <td>${p.job_id ?? "-"}</td>
-                <td>${p.joining_date ?? "-"}</td>
-                <td>${p.package ?? "-"}</td>
-                <td>${p.placement_status ?? "-"}</td>
-            </tr>
-        `).join("");
+        // Apply currently selected filter
+        filterPlacements();
 
     } catch (error) {
+
         table.innerHTML =
             "<tr><td colspan='7'>Unable to load placement records.</td></tr>";
+
         message.textContent = error.message;
+
     }
 }
 
+
+// INITIAL LOAD
 loadPlacements();
+
 </script>
 
 </body>
